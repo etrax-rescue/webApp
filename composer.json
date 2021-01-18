@@ -1,0 +1,8 @@
+{
+	"config": {
+        "vendor-dir": "dev/vendor"
+	},
+    "require": {
+        "adhocore/jwt": "^1.1"
+	}
+}

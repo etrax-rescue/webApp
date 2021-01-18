@@ -1,0 +1,56 @@
+body{
+	&.einsatz-start{
+		.btn-outline-danger:hover{
+			color:$white!important;
+			.material-icons{
+				color:$white!important;
+			}
+		}
+		.starticons, .material-icons, a .material-icons{
+		color:$red;
+		}
+		.starticons {
+			width:100%;
+			height:50px;
+			line-height:50px;
+			a {
+				color: $gray;
+				font-size: 1.5em;
+				line-height:50px;
+				.material-icons {
+					margin-top: 0;
+					margin-right: 10px;
+					font-size: 40px;
+				}
+			}
+		}
+		a:hover, a:hover .material-icons {
+			color: $red;
+			text-decoration:none;
+		}
+		.infofooter{
+			bottom: 0;
+			width: 100%;
+			padding-left:20px;
+			height: 38px;
+			background-color: none;
+			color: $white;
+			z-index:40;
+		}
+		[data-toggle="collapse"] .fa:before {  
+			font-family: 'Material Icons';
+			color: $red;
+			font-size:1.5em;
+			vertical-align: sub;
+			content: 'expand_less'
+		}
+
+		[data-toggle="collapse"].collapsed .fa:before {
+			font-family: 'Material Icons';
+			color: $red;
+			font-size:1.5em;
+			vertical-align: sub;
+			content: 'expand_more'
+		}
+	}
+}

@@ -1,0 +1,131 @@
+
+#benutzer {
+	background:$white;
+	font-size: 13px;
+	#memberlist a {
+		line-height: 26px;
+	}
+	#members{
+		.user{
+			cursor: default;
+		}
+		.usertyp{
+			cursor: pointer;
+		}
+		.d-inline-block.typ{
+			width: 25px;
+		}
+		#collapseMaterial{
+			.edituser.material-icons{
+				display:none!important;
+			}
+		}
+	}
+	.members {
+		.user{
+			cursor: default;
+		}
+		.usertyp{
+			cursor: pointer;
+		}
+		.d-inline-block.typ{
+			width: 25px;
+		}
+	   li{
+		   .useredit{
+			   select{
+				   -webkit-appearance:none;
+				   border:0;
+				   width:auto;
+				   background:transparent;
+			   }
+			   &.active select{
+				   border:1px solid $gray-dark;
+				   background:$red;
+				   color:##{$white};
+			   }
+		   }
+		   &:hover .useredit select{
+			   color:##{$white};
+		   }
+	   } 
+   }
+}
+
+.members{
+	&.custom-state-active {
+		background: $white;
+	}
+	li {
+		float: none;
+		text-align: left;
+		color:$gray;
+	}
+	li.sender{
+		span {
+			background: $teal;
+			font-weight: bold;
+		}
+	}
+	li a {
+		float: right;
+	}
+	.back {
+		background: $mint;
+		border: 1px solid $red;
+	}
+	.sendet {
+		background: $blue-light;
+	}
+	.commander.sendet {
+		background: $blue-light;
+	}
+}	
+#members{
+	.kommandant{
+		display: none;
+	}
+	span a.icon {
+		display: none;
+	}
+	.userinfo {
+		display:none;
+	}
+	.sendet {
+		background: $blue-light;
+	}
+	.commander.sendet {
+		background: $blue-light;
+	}
+} 
+#memberlist{
+	 .back{
+		background: $mint;
+		border: 1px solid $red;
+	}
+	.red60 {
+		border: 1px solid $red;
+		background:$red;
+	}
+	.red60 span {
+		background:$red;
+		color: $white;
+	}
+	.red30 {
+		border: 1px solid $red;
+		background: transparent;
+	}
+	.red30 span {
+		color:$red;
+	}
+	.green {
+		color: $green;
+	}
+	.typcn-warning {
+		float: right;
+	}
+	.typcn-warning:before {
+		color:$red;
+		font-size: 18px;
+	}
+}

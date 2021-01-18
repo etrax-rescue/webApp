@@ -1,0 +1,9 @@
+/**!
+ * eTrax | rescue
+ * version: 5.0.1
+ * Copyright (c) 2020 P.Toscani, N.Piso
+ * Examples and documentation at: https://www.etrax.at
+ * Project repository: https://github.com/pisoni/eTrax
+ * licensed under the MIT.
+ * https://www.etrax.at/lizenz
+ */

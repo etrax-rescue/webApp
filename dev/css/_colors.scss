@@ -1,0 +1,64 @@
+$blue-light: #88c1ff;
+$blue: #007bff;
+$indigo: #6610f2;
+$purple: #6f42c1;
+$pink: #e83e8c;
+$red: #dc3545;
+$lightred: #ffa4ae;
+$red-50: #dc35463f;
+$orange: #fd7e14;
+$yellow: #ffc107;
+$t-yellow: #ffc1079f;
+$green: #28a745;
+$lightgreen: #a0fcb5;
+$teal: #20c997;
+$cyan: #17a2b8;
+$middleblue: #4363d8;
+$lightgray: #f5f5f5;
+$gray: #6c757d;
+$gray-dark: #343a40;
+$navy: #000075;
+$lime: #bfef45;
+$magenta: #f032e6;
+$mint: #aaffc3;
+$lavender: #e6beff;
+$darkyellow: #ffe119;
+$black: #000000;
+$white: #ffffff;
+$t-white: #ffffff9f;
+
+$colorname: blue, indigo, purple, pink, red, lightred, red-50, orange, yellow, green, lightgreen, teal, cyan, middleblue, gray, gray-dark, lightgray, navy, lime, magenta, mint, lavender, darkyellow, black, white;
+$colors: 007bff, 6610f2, 6f42c1, e83e8c, dc3545, ffa4ae, dc35463f, fd7e14, ffc107, 28a745, a0fcb5, 20c997, 17a2b8, 4363d8, 6c757d, 343a40, f5f5f5, 000075, bfef45, f032e6, aaffc3, e6beff, ffe119, 000000, ffffff;
+$colorcode: #007bff, #6610f2, #6f42c1, #e83e8c, #dc3545, #ffa4ae, #dc35463f, #fd7e14, #ffc107, #28a745, #a0fcb5, #20c997, #17a2b8, #4363d8, #6c757d, #343a40, #f5f5f5, #000075, #bfef45, #f032e6, #aaffc3, #e6beff, #ffe119, #000000, #ffffff;
+@each $color in $colors {
+    $i: index($colors, $color);
+    $Code: nth($colorcode, $i);
+    $Name: nth($colorname, $i);
+	.c-#{$color}.colorswitch{
+		color:#{$Code}!important;
+	}
+	.material-icons.#{$color}{
+		color:#{$Code}!important;
+	}
+	.color-#{$color}{
+		color:#{$Code}!important;
+	}
+	.bg-#{$color}{
+		background:#{$Code}!important;
+	}
+	.border-#{$color}{
+		border-color:#{$Code}!important;
+	}
+	.material-icons.#{$Name}{
+		color:#{$Code}!important;
+	}
+	.color-#{$Name}{
+		color:#{$Code}!important;
+	}
+	.bg-#{$Name}{
+		background:#{$Code}!important;
+	}
+	.border-#{$Name}{
+		border-color:#{$Code}!important;
+	}
+}

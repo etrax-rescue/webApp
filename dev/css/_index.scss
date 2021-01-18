@@ -1,0 +1,245 @@
+html,
+body {
+	font-family: 'RobotoRegular', sans-serif;
+	letter-spacing: .3px;
+	font-size: 16px;
+	margin: 0;
+	padding: 0;
+}
+body {
+	background:linear-gradient(60deg, #999, $white);
+	}
+h1{
+	font-size:25px;
+	font-family: 'RobotoBold';
+}
+h2,h4,h4.btn,h5{
+	font-size:20px;
+	font-family: 'RobotoMedium';
+}
+h5.modal-title{
+	font-size:23px;
+	font-family: 'RobotoBold';
+}
+#mama {
+	font-size: 13px;
+}
+a {
+	color: $gray-dark;
+	text-decoration: none;
+}
+.pac-container {
+    z-index:2000!important;
+}
+.modal i.material-icons {
+    font-size: 40px;
+}
+
+li:hover .material-icons{
+	color:$blue;
+}
+.nofloat {
+	clear: both;
+	float: none;
+	font-size:0px;
+	height:1px;
+	border:0;
+}
+.inside {
+	padding: 3px;
+}
+.right {
+	float: right
+}
+.hidden,
+.mobile {
+	display: none;
+}
+.screen {
+	display: inline-block;
+}
+.rot,
+.red {
+	color:$red;
+}
+.green {
+	color: $green;
+}
+.bgwhite {
+	background: $white;
+}
+.preventjumping {
+	line-height: 28px;
+}
+#login {
+	margin: 20px auto;
+	text-align: center;
+	width:100%;
+	min-width: 270px;
+	max-width: 500px;
+	padding: 15px;
+	background: $white;
+	border-radius: 7px;
+	border: 1px solid $white;
+	float:none;
+	img {
+		background: $white;
+		padding: 5px;
+		border-radius: 10px;
+	}
+	label {
+		width: 105px;
+	}
+	select {
+		font-size: 20px;
+		text-align: center;
+	}
+	p {
+		color:$red;
+	}
+	.submittext {
+		color:$red;
+	}
+	.submitter .material-icons {
+		font-size: 40px;
+		color:$red;
+	}
+	.alert {
+		background: $red;
+		padding: 3px;
+		color: $white;
+	}
+}
+.starticons .material-icons {
+	margin-top: 10px;
+	font-size: 40px;
+}
+.starticons {
+	position: relative;
+	width: 50px;
+	overflow: hidden;
+	margin-right: 0px;
+	float: left;
+}
+.starticons a {
+	position: relative;
+	display: block;
+	color: $green;
+}
+.starticons a b {
+	color:$black;
+	font-size: 10px;
+}
+.starticons a:hover {
+	color:$red;
+}
+.protokolle .material-icons {
+	padding: 0 0 0 10px;
+	float: right;
+	color: $blue!important;
+}
+.protokolle a:hover .material-icons,
+.protokolle .list-group-item-danger .material-icons {
+	color:$red!important;
+}
+#etraxadmins tr {
+	line-height: 20px;
+}
+.newAdmin {
+	display: none;
+}
+#mailliste {
+	position: absolute;
+	top: 0;
+	left: -600px;
+	padding: 10px 20px 20px 20px;
+	z-index: 10000;
+	background: $white;
+}
+#mitgliederliste {
+	margin: 10px 0 0 0;
+	list-style-type: none;
+}
+#mitgliederliste li {
+	margin: 5px 0 0 0;
+	list-style-type: none;
+}
+.neuereinsatz {
+	display: none;
+}
+#neuereinsatz h2,
+#einsatzbeenden h2,
+#einsatzloeschen h2,
+#rueckmeldung h2 {
+	color:$black;
+	font-size: 15px;
+	padding-top: 0;
+	margin-top: 0;
+}
+#neuereinsatz label {
+	font-size: 12px;
+	padding-right: 20px;
+}
+#neuereinsatz #einsatzbeginn,
+#einsatzloeschen #einsatzdelete {
+	margin: 0 0 20px 100px;
+}
+#neuereinsatz .abbruch,
+#einsatzbeenden .abbruch,
+#einsatzloeschen .abbruch {
+	color:$red;
+} 
+#einsatzauswahl {
+	line-height: 27px;
+	#einsatz {
+		width: 190px;
+		margin: auto;
+	}
+}
+
+/*Liste der anwesenden Mitglieder*/
+
+.userlist {
+	height: 100%;
+}
+
+.servicediv .custom-select:disabled {
+	color:$black;
+	background-color: $white;
+	border: 0;
+	font-size:13px;
+}
+.servicediv table {
+	font-weight: normal;
+	font-size: 13px;
+	margin: 0;
+}
+.servicediv section {
+	float:left;
+	margin-left: 40px;
+}
+/*Styles für benutzer.php*/
+
+
+.btn.typbeschreibung {
+	white-space: normal!important;
+	color:$red!important;
+}
+.tooltip{
+	background:transparent!important;
+	}
+	
+
+@media (max-width: 992px) {
+	#memberlist{
+		height:50vh;
+		overflow-y: scroll;
+	}
+}
+
+#showAreas{
+	table{
+		border-spacing: 10px;
+		border-collapse: separate;
+	}
+}

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<noscript>
+		   <meta http-equiv="refresh" content="0; url=index.php">
+		 </noscript>
+		<title>eTrax|rescue</title>
+		<meta charset="UTF-8">
+		<meta name="description" content="GPS Einsatztrackingtool">
+		<meta name="author" content="Phlipp Toscani & Nicolaus Piso">
+		<meta name="creator" content="Nicolaus Piso">
+		<meta name="robots" content="noindex,nofollow">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="format-detection" content="telephone=yes">
+		<link rel="shortcut icon" href="img/icon.png" type="image/png">
+		<link rel="stylesheet" href="css/styles.css">
+	</head>
+	<body>
+		<nav class="navbar navbar-light position-absolute">
+			<button tabindex="1" class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation"><span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar top-bar"></span>
+				<span class="icon-bar middle-bar"></span>
+				<span class="icon-bar bottom-bar"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="mainNav">
+				<ul class="navbar-nav">
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" id="chooseMap" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="#"><i class="material-icons">layers</i> Kartentyp</a>
+						<div class="dropdown-menu basiskarten" aria-labelledby="chooseMap"> 
+						</div>
+					</li>
+					<li class="nav-item dropdown">
+						<a class="nav-link personenimeinsatz" href="#"><i class="material-icons">group</i> Gruppeneinteilung [alt+G]</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link protokoll" href="#"><i class="material-icons">description</i> Protokoll [alt+E]</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link funkprotokoll" href="#"><i class="material-icons">speaker_notes</i> Funkprotokoll [alt+F]</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link suchgebiete" data-toggle="modal" href="#"><i class="material-icons">search</i> Suchgebiete [alt+S]</a>
+					</li>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" id="showPOIs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="#"><i class="material-icons">place</i> POIs [alt+P]</a>
+						<div class="dropdown-menu" aria-labelledby="showPOIs">
+							<a href="#" class="dropdown-item center-EL">Auf Einsatzleitung zentrieren [alt+Z]</a>
+							<a href="#" class="dropdown-item set-EL">Einsatzleitung setzen</a>
+							<a href="#" class="dropdown-item set-poi">POI setzen [alt+N]</a>
+							<a href="#" class="dropdown-item poiList" data-toggle="modal">POIs anzeigen [alt+P]</a>
+						</div>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link dropdown-toggle" id="showTracks" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"  href="#"><i class="material-icons">gesture</i> User-Tracks [alt+T]</a>
+						<div class="dropdown-menu" aria-labelledby="showTracks">
+							<a class="dropdown-item hidetracks" href="#">Alle User-Tracks ein-/ausblenden [alt+H]</a>
+							<a class="dropdown-item usertracks" href="#">User-Tracks anzeigen [alt+T]</a>
+							<a class="dropdown-item importtracks" href="#">User-Tracks importieren [alt+I]</a>
+							<a class="dropdown-item tracksettings" href="#">User-Tracks Einstellung</a>
+						</div>
+					</li>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" id="showProfil" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="#"><i class="material-icons">face</i> Vermisst [alt+V]</a>
+						<div class="dropdown-menu" aria-labelledby="showProfil">
+							<a href="#" class="dropdown-item suchprofil">Vermissteninfos anzeigen [alt+V]</a>
+							<a href="#" class="dropdown-item set-ppi">Letzte Personensichtung setzen</a>
+						</div>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link mitgliederliste" data-toggle="modal" href="#"><i class="material-icons">group</i> Userliste [alt+U]</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link addresse" href="#"><i class="material-icons">location_searching</i> Adress- & Koordinatensuche [alt+A]</a>
+					</li>
+				</ul>
+			</div>
+		</nav>
+		<div class="modal fade alertmodal" tabindex="-1" role="dialog" id="alert" aria-labelledby="alertheader" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-body">
+						<div class="col-12 text-center">
+							<div id="alertdiv"></div>
+							<div class="clearfix"></div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Schliessen</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade protokollmodal" tabindex="-1" role="dialog" id="ereignisprotokoll" aria-labelledby="ereignisprotokollheader" aria-hidden="true">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title mr-auto" id="ereignisprotokollheader">Ereignisprotokoll:</h5>
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Schliessen</button>
+					</div>
+					<div class="modal-body">
+						<div class="servicediv protokoll">
+							<form id="protokoll">
+								<input type="hidden" name="ptime" id="ptime" value=""> 
+								<div class="input-group">
+									<div class="input-group-prepend">
+										<span class="input-group-text">Ereignis</span>
+									</div>
+									<textarea class="form-control" name="protokolltext" id="protokolltext" aria-label="Ereignistext"></textarea>
+								</div>
+								<input class="btn btn-primary protokollieren mt-4 mb-4" type="button" value="protokollieren" id="textsubmit">
+							</form>
+						</div>
+						<div id="protokolldiv">
+							<div class="input-group mb-3">
+								<div class="input-group-prepend">
+									<span class="input-group-text w-auto" id="protokollsorter">Protokollierte Ereignisse</span>
+								</div>
+								<input type="text" class="form-control sortliste" placeholder="filtern nach ..." data-listID="#protokolliert" aria-label="protokollsorter" aria-describedby="protokollsorter">
+							</div>
+							<ul id="protokolliert"></ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade funkprotokollmodal" tabindex="-1" role="dialog" id="funkprotokollmodal" aria-labelledby="funkprotokoll" aria-hidden="true">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title mr-auto" id="funkprotokollheader">Funkprotokoll:</h5>
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Schliessen</button>
+					</div>
+					<div class="modal-body">
+						<div class="col-12 text-center">
+							<div class="servicediv protokoll">
+								<form id="funkprotokoll" class="text-left">
+									<div class="input-group mb-3">
+										<div class="input-group-prepend">
+										  	<span class="input-group-text" id="uhrzeit">Zeit</span>
+										</div>
+										<input type="text" class="form-control" name="ftime" id="ftime" value="" aria-label="Aktuelle Zeit" aria-describedby="uhrzeit">
+										<div class="input-group-append">
+											<input type="button" class="btn btn-primary" id="changetime" value="Zeit aktualisieren">
+										</div>
+									</div>
+									<div class="input-group mb-3">
+										<div class="input-group-prepend">
+										  	<span class="input-group-text" id="funkmittel">Funkmittel</span>
+										</div>
+										<input type="text" class="form-control" name="funkid" id="funkid" value="" aria-label="Funkmittel" aria-describedby="funkmittel">
+									</div>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text" id="spruch">Spruch</span>
+										</div>
+										<textarea class="form-control" name="funkprotokolltext" id="funkprotokolltext" aria-label="spruch"></textarea>
+									</div>
+									<input class="btn btn-primary protokollieren mt-4 mb-4" type="button" value="protokollieren" id="funktextsubmit">
+								</form>
+							</div>
+							<div id="funkprotokolldiv">
+								<div class="input-group mb-3">
+									<div class="input-group-prepend">
+										<span class="input-group-text w-auto" id="protokollsorter">Protokollierte Funksprüche</span>
+									</div>
+									<input type="text" class="form-control sortliste" placeholder="filtern nach ..." data-listID="#funkprotokolliert" aria-label="protokollsorter" aria-describedby="protokollsorter">
+								</div>
+								<ul id="funkprotokolliert"></ul>
+							</div>
+							<div class="clearfix"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade searchAreas" tabindex="-1" role="dialog" id="suchgebiete" aria-labelledby="searchAreas" aria-hidden="true">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title mr-auto" id="searchAreas">Suchgebiete:</h5>
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Schliessen</button>
+					</div>
+					<div class="modal-body">
+						<form class="suchgebiet-form">
+							<div class="input-group mb-3">
+								<div class="input-group-prepend">
+								  	<label class="input-group-text" for="searchtype">Typ</label>
+								</div>
+								<select class="custom-select" id="searchtype">
+									<option value="">wählen</option>
+									<optgroup label="----------">
+										<option value="area">Suchgebiet</option>
+										<option value="length">Wegsuche</option>
+										<option value="trail">Mantrailer</option>
+										<option value="point">Punktsuche</option>
+									</optgroup>
+									<optgroup label="----------">
+										<option value="areaoverview">Übersichtskarte</option>
+									</optgroup>
+								</select>
+								<div class="input-group-prepend">
+									<label class="input-group-text" for="grouparea">für</label>
+								</div>
+								<select class="custom-select" id="grouparea"></select>
+								<div class="input-group-append">
+									<button class="btn btn-primary start-measure">anlegen</button>
+								</div>
+							</div>
+						</form>
+						<div id="area"></div>
+						<button class="btn btn-primary success save-area">Speichern</button> 
+						<button class="btn btn-danger stop-measure">Löschen</button>
+						<div id="showAreas">
+							<table></table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade memberList" tabindex="-1" role="dialog" id="personenimeinsatz" aria-labelledby="memberList" aria-hidden="true">
+			<div class="modal-dialog modal-xxl">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title mr-auto" id="memberList">Gruppeneinteilung:</h5>
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Schliessen</button>
+					</div>
+					<div class="modal-body">
+						<div class="col-12">
+							<div class="row">
+								<div id="mList" class="col-4">
+									<div id="imEinsatz" data-groupID="0">
+										<i class="material-icons add to_list">add_box</i>Personen im Einsatz:
+									</div> 
+									<div id="members" data-groupID="0" class="members ui-helper-reset ui-helper-clearfix"></div>
+								</div>
+								<div class="col-8">
+									<a href="#" data-id="" class="newGroup"><i data-color="#000000" class="material-icons">add_box</i>neue Gruppe anlegen</a>
+									<div id="eGroups" class="col-12"></div>
+								</div>
+								<div class="clearfix"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade setPOI" tabindex="-1" role="dialog" id="setPOI" aria-labelledby="setpoi" aria-hidden="true">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title mr-auto" id="setpoi">Points of Interest</h5>
+						<button type="button" class="btn btn-secondary" onclick="javascript:document.getElementById('poiForm').reset();" data-dismiss="modal">Schliessen</button>
+					</div>
+					<div class="modal-body">
+						<form id="poiImage">
+							<input type="hidden" name="eid" class="eid" value="">
+							<input type="hidden" name="name" class="poiImagename" value="">
+							<input type="hidden" name="base64img" id="base64img" value="">
+							<input type="hidden" name="base64size" id="base64size" value="">
+							<div class="form-group">
+								<label for="upload_image" class="col-form-label">Bild abfotografieren oder hochladen:</label><br>
+								<input type="file" id="upload_poi_image" name="upload_image" class="form-control" accept="image/*;capture=camera"><br><br>
+								<div id="poiImgpreview" class="float-right"></div>
+							</div>
+						</form>
+						<form id="poiForm">
+							<input class="mb-3" type="text" name="poiname" id="poiname" placeholder="Bezeichnung" value=""><br>
+							<textarea name="poidesc" id="poidesc" cols="50" rows="5" placeholder="Beschreibung"></textarea><br>
+							<div id="POIcoords"></div><br>
+							<div class="poiKoordinaten">
+								<strong>UTM33U Koordinaten:</strong>
+								<div class="input-group mb-3">
+									<div class="input-group-prepend">
+										<span class="input-group-text" id="basic-addon1">RW:</span>
+									</div>
+									<input type="number" value="" data-type="utm" name="poilonutm" id="poilonutm">
+								</div>
+								<div class="input-group mb-3">
+									<div class="input-group-prepend">
+										<span class="input-group-text" id="basic-addon1">HW:</span>
+									</div>
+									<input type="number" value="" data-type="utm" name="poilatutm" id="poilatutm">
+								</div>
+
+								<strong>Dezimalgrad Koordinaten:</strong>
+								<div class="input-group mb-3">
+									<div class="input-group-prepend">
+										<span class="input-group-text" id="basic-addon1">E:</span>
+									</div>
+									<input type="number" value="" data-type="grad" name="poilond1" id="poilond1" class="gradX"><b><sub>&sdot;</sub></b>
+									<input type="number" value="" data-type="grad" name="poilond2" id="poilond2">
+								</div>
+								<div class="input-group mb-3">
+									<div class="input-group-prepend">
+										<span class="input-group-text" id="basic-addon1">N:</span>
+									</div>
+									<input type="number" value="" name="poilatd1" id="poilatd1" class="gradY"><b><sub>&sdot;</sub></b>
+									<input type="number" value="" name="poilatd2" id="poilatd2">
+								</div>
+							</div>
+						</form>
+						<button class="btn btn-primary savePOI">Speichern</button> 
+						<button class="btn btn-danger löschen" onclick="javascript:document.getElementById('poiForm').reset();" data-dismiss="modal">Löschen</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade poiListmodal" tabindex="-1" role="dialog" id="poiList" aria-labelledby="poiListheader" aria-hidden="true">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title mr-auto" id="poiListheader">Points of Interest</h5>
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Schliessen</button>
+					</div>
+					<ul id="poiListing" class="list-unstyled pl-4 pr-4">
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade mitgliederliste" tabindex="-1" role="dialog" id="mitgliederliste" aria-labelledby="mitgliederlisteheader" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title mr-auto" id="mitgliederlisteheader">Userliste:</h5>
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Schliessen</button>
+					</div>
+					<input placeholder="filtern nach ..." class="sortliste btn btn-outline-primary mr-2 ml-2" data-listID="#contactlist" type="text"><br>
+					<ul id="contactlist" class="list-unstyled pl-4 pr-4">
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade ImgModal" tabindex="-1" role="dialog" id="ImgModal" aria-labelledby="ImgModalheader" aria-hidden="true">
+			<div class="modal-dialog modal-xl">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="ImgModalheader">Bild</h5>
+					</div>
+					<div class="imagelayer pl-4 pr-4">
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Schliessen</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade adresssuche" tabindex="-1" role="dialog" aria-labelledby="adressuche" aria-hidden="true">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title mr-auto" id="adressuche">Adress- & Koordinatensuche</h5>
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Schliessen</button>
+					</div>
+					<div class="modal-body">
+						<div class="input-group">
+							<div class="input-group-prepend">
+								<span class="input-group-text">Adresse:</span>
+							</div>
+							<input type="text" placeholder="Adresse suchen (Strasse, Ort)" name="adressegesucht" id="adressegesucht" class="adressegesucht form-control">
+							<div class="input-group-append">
+								<button type="button" class="adressesuchen btn btn-primary">suchen</button>
+							</div>
+						</div>
+						<h5 class="modal-title mt-4 mb-2" id="adressuche">Koordinatensuche</h5>
+						<div class="input-group">
+							<div class="input-group-prepend">
+								<span class="input-group-text">UTM</span>
+							</div>
+								<input type="number" placeholder="RW" aria-label="RW" class="coordsuche-rw form-control">
+								<input type="number" placeholder="HW" aria-label="HW" class="coordsuche-hw form-control">
+							<div class="input-group-append">
+								<button type="button" class="utm coordsuche btn btn-primary">suchen</button>
+							</div>
+						</div>
+						<div class="input-group mt-2">
+							<div class="input-group-prepend">
+								<span class="input-group-text">Dezimalgrad</span>
+							</div>
+								<input type="number" placeholder="Lon" aria-label="Lon" step="any" class="coordsuche-lon form-control">
+								<input type="number" placeholder="Lat" aria-label="Lat" step="any" class="coordsuche-lat form-control">
+							<div class="input-group-append">
+								<button type="button" class="gm coordsuche btn btn-primary">suchen</button>
+							</div>
+						</div>
+						<label class="input-group-text mt-4">Koordinaten in Grad Minute Sekunde</label>
+						<div class="input-group mt-2">
+							<div class="input-group-prepend">
+								<span class="input-group-text">Lon</span>
+							</div>
+							<input type="number" placeholder="Grad" aria-label="GLon" step="any" class="coordsuche-GLon form-control">
+							<input type="number" placeholder="Minuten" aria-label="MLon" step="any" class="coordsuche-MLon form-control">
+							<input type="number" placeholder="Sekunden" aria-label="SLon" step="any" class="coordsuche-SLon form-control">
+						</div>
+						<div class="input-group mt-2">
+							<div class="input-group-prepend">
+								<span class="input-group-text">Lat</span>
+							</div>
+							<input type="number" placeholder="Grad" aria-label="GLat" step="any" class="coordsuche-GLat form-control">
+							<input type="number" placeholder="Minuten" aria-label="MLat" step="any" class="coordsuche-MLat form-control">
+							<input type="number" placeholder="Sekunden" aria-label="SLat" step="any" class="coordsuche-SLat form-control">
+						</div>
+						<div class="input-group">
+							<button type="button" class="gms coordsuche btn btn-primary ml-auto mt-2">suchen</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade gesuchtePerson vermisst" tabindex="-1" role="dialog" aria-labelledby="vermisst" aria-hidden="true">
+			<div class="modal-dialog modal-xl">
+				<div class="modal-content">
+				</div>
+			</div>
+		</div>
+		<div class="modal fade usertracks" tabindex="-1" role="dialog" aria-labelledby="usertrackstitle" aria-hidden="true">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="usertrackstitle">Usertracks:</h5>
+						<button type="button" class="btn btn-primary trackselect ml-auto" data-dismiss="modal">Anwenden</button>
+						<button type="button" class="btn btn-secondary ml-2" data-dismiss="modal">Schliessen</button>
+					</div>
+					<div class="modal-body" id="tracklist">
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade tracksettings" tabindex="-1" role="dialog" aria-labelledby="tracksettingstitle" aria-hidden="true">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="tracksettingstitle">Usertrack Settings:</h5>
+						<button class="btn btn-primary savetracksettings ml-auto" type="button" data-toggle="modal" data-session="strokewidth">Anwenden</button>
+						<button type="button" class="btn btn-secondary ml-2" data-dismiss="modal">Schliessen</button>
+					</div>
+					<div class="modal-body">
+						<div class="input-group">
+							<div class="input-group-prepend">
+								<span class="input-group-text"  for="strokewidth">Tracklinien</span>
+							</div>
+							<select name="strokewidth" class="custom-select" id="strokewidth" size="1">
+								<option value="0">Keine Linie</option>
+								<option value="1">dünne Linie</option>
+								<option value="2">dicke Linie</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade trackimport" tabindex="-1" role="dialog" aria-labelledby="trackimporttitle" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title mr-auto" id="trackimporttitle">GPX Track importieren:</h5>
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Schliessen</button>
+					</div>
+					<div class="modal-body" id="trackimport">
+						<form id="gpximporter" enctype="multipart/form-data">
+							<div class="input-group mt-2 mb-2">
+								<div class="input-group-prepend">
+									<label for="gpxsender" class="input-group-text">Sender</label>
+								</div>
+								<select class="custom-select" id="gpxsender"></select>
+							</div>
+							<div class="input-group mt-2 mb-2">
+								<div class="input-group-prepend">
+									<label for="gpxgruppe" class="input-group-text">Gruppe</label>
+								</div>
+								<select class="custom-select" id="gpxgruppe"></select>
+							</div>
+							<div class="input-group mt-2 mb-2">
+								<div class="input-group-prepend">
+									<label for="gpxfile" class="custom-file-label">GPX Datei</label>
+								</div>
+								<input name="gpxfile" id="gpxfile" type="file" class="custom-file-input">
+								<label for="gpxfile" class="custom-file-label">Track-Datei wählen</label>
+							</div>
+							<input class="btn btn-primary float-right" name="submit" type="submit" id="submitgpx" value="Importieren">
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade mailer" tabindex="-1" role="dialog" id="mailer" aria-labelledby="mailerheader" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="mailerheader">Suchgebiet per Mail schicken:</h5>
+					</div>
+					<ul id="groupmemberlist" class="list-unstyled pl-4 pr-4" data-gruppenID="" data-SID="">
+					</ul>
+					<div class="modal-footer">
+						<a href="#" class="btn btn-primary" id="suchgebiet_senden" data-email="">Senden</a>
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Schliessen</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade messanger" tabindex="-1" role="dialog" aria-labelledby="messangertitle" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="messangertitle"></h5>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Schliessen</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade settings" tabindex="-1" role="dialog" aria-labelledby="settings" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="settings"></h5>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade userinfo" tabindex="-1" role="dialog" id="userinfo" aria-labelledby="userinfoheader" aria-hidden="true">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="userinfoheader">Informationen:</h5>
+					</div>
+					<div class="modal-body">
+						<div class="form-group row">
+							<div class="col-sm-12">
+								<input type="text" class="form-control w-100" name="userinfo" id="userinfo" tabindex="3">
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-primary saveinfo" type="button" id="infosubmit" tabindex="4" data-uid="">speichern</button>
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Schliessen</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="loader"><div class="loader"><img src="img/etrax-90.png"><br>eTrax lädt Inhalte!</div></div>
+		<div id="mapdiv" tabindex="0">
+			<div id="mapcenter"><i class="material-icons">gps_fixed</i></div>
+			<div id="elementinfo"></div>
+		</div>
+		<div id="mapInfo">
+			<span class="menu text-right"><a href="#" class="material-icons move">zoom_out_map</a><a href="#" class="material-icons fixed">close</a></span>
+			<div class="mapcenter float-left"></div><span class='badge badge-light mr-2'>Zoom:</span><div class="zoom d-inline-block"></div><span class='badge badge-light mr-2'>Mausposition:</span><div id="mouse-position" class="d-inline-block"></div>
+		</div>
+			<form id="maps"></form>
+			<div id="debug"></div>
+			<div id="coords"></div>
+			<div id="message"></div>
+			<div class="usertracks"></div>
+			<div id="garbagebin"></div>
+			<script src="js/ol.js"></script>
+	</body>
+</html>

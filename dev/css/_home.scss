@@ -1,0 +1,166 @@
+body{
+	&.home{
+		.containerlogo{
+			position: absolute;
+			z-index:10;
+			top: 0;
+			width: 100%;
+			.landinglogocontainer{
+				margin-top:60px;
+				@media (min-width: 576px) {
+					margin-top:150px;
+				}
+				&.white{
+					background:rgba(255,255,255,0.7);
+					border:0;
+					border-top:2px solid #fff;
+					border-bottom:2px solid #fff;
+				}
+				.landinglogo{
+					max-width:800px;
+					margin:0 auto;
+					img{
+						max-width:100%;
+					}
+				}
+			}
+			.landingtextcontainer{
+				margin-top:30px;
+				@media (min-width: 576px) {
+					margin-top:50px;
+				}
+				background-color:rgba(255,255,255,0.5);
+				border-top: 2px solid #fff;
+				border-bottom: 2px solid #fff;
+				.landingclaim{
+					font-family: OxaniumLight, sans-serif;
+					color:#465a63;
+					padding: 23px 0;
+					@media (min-width: 576px) {
+						padding: 43px 0;
+					}
+					max-width: 800px;
+					width: 100%;
+					margin: 0 auto;
+					height:100%;
+					text-align:right;
+					h2{
+						font-family: JuraMedium, sans-serif;
+						font-size: 25px;
+						letter-spacing: 0.9px;
+						line-height: normal;
+						padding: 0;
+						margin: 0;
+						@media (min-width: 576px) {
+							font-size: 38px;
+						letter-spacing: 0.5px;
+						}
+						b{
+							font-weight: bolder;
+						}
+					} 
+					div{
+						font-family: JuraLight, sans-serif;
+						font-size: 15px;
+						margin-top: 0;
+						letter-spacing: 1.2px;
+						@media (min-width: 576px) {
+							font-size: 23px;
+							margin-top: -7px;
+						}
+					}
+				}
+			}
+		}
+		.loginbtn{
+			font-family: JuraMedium, sans-serif;
+			font-size: 40px;
+			color:#fff;
+			text-align:center;
+			letter-spacing: 0.5px;
+			z-index:100;
+			position: absolute;
+			top: 0px;
+			right:5px;
+			padding:0px 30px 5px;
+			background: #9a0007;
+			border-radius: 0px 0px 10px 10px;
+			cursor:pointer;
+		}
+		.qrbtn{
+			height: 65px;
+			color:#fff;
+			text-align:center;
+			letter-spacing: 0.5px;
+			z-index:100;
+			position: absolute;
+			top: 0px;
+			right: 180px;
+			padding:8px 30px 5px;
+			background: #9a0007;
+			border-radius: 0px 0px 10px 10px;
+			cursor:pointer;
+		}
+		#appqr{
+			width:200px;
+			margin:auto;
+		}
+		.landingfooter{
+			position: absolute;
+			bottom: 0;
+			width: 100%;
+			color: #fff;
+			.poweredby{
+				.poweredbytext{
+					opacity: 0.7;
+					color: #fff;
+					font-family: JuraLight, sans-serif;
+					font-size: 13px;
+					@media (min-width: 576px) {
+						font-size: 23px;
+					}
+					letter-spacing: 0.5px;
+					padding-left: 12px;
+				}
+				.netidee{
+					cursor:pointer;
+					height:50px;
+					@media (min-width: 576px) {
+						height:91px;
+					}
+					background: rgba(255,255,255,0.65);
+					border-radius:5px 0 0 0;
+					img{
+						height:50px;
+						@media (min-width: 576px) {
+							height:auto;
+						}
+					}
+				}
+			}
+			.landingfootercontainer{
+				font-size: 16px;
+				line-height: 180%;
+				background-color: #1c313a;
+				width: auto;
+				padding: 15px;
+				text-align: center;
+				color:#D3302F;
+				a{
+					font-family: JuraMedium, sans-serif;
+					letter-spacing: 1px;
+					padding: 0 15px;
+					text-align: center;
+					color:#fff;
+				}
+			}
+		}
+		.modal h4{
+			 color:#9a0007;
+			 padding-top:35px;
+			 &:first-child{
+			 padding-top:15px;
+			}
+		}
+	}
+}

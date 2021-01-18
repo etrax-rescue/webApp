@@ -1,0 +1,45 @@
+{
+	"name": "etrax.v.5gulp",
+	"version": "1.0.0",
+	"description": "Verwaltung und Livetracking für Personensuchen",
+	"scripts": {
+		"build": "gulp",
+		"watch": "gulp --watch"
+	},
+	"dependencies": {
+		"bootstrap": "^4.5.3",
+		"dom-to-image": "^2.6.0",
+		"jquery": "^3.5.1",
+		"jquery-bridget": "^2.0.1",
+		"masonry-layout": "^4.2.2",
+		"ol": "^5.3.3",
+		"ol-ext": "^3.1.16",
+		"popper.js": "^1.16.1",
+		"proj4": "^2.6.2"
+	},
+	"devDependencies": {
+		"fs": "0.0.1-security",
+		"gulp": "^4.0.2",
+		"gulp-clean": "^0.4.0",
+		"gulp-clean-css": "^4.3.0",
+		"gulp-composer": "^0.4.5",
+		"gulp-concat": "^2.6.1",
+		"gulp-header": "^2.0.9",
+		"gulp-if": "^3.0.0",
+		"gulp-sass": "^4.1.0",
+		"gulp-terser": "^1.4.0",
+		"gulp-uglify": "^3.0.2",
+		"gulp-useref": "^5.0.0",
+		"merge-stream": "^2.0.0",
+		"node-sass": "^4.14.1",
+		"webpack-stream": "^6.1.0"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "SEE LICENSE IN https://v5.etrax.at/lizenz/",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/pisoni/eTrax.git"
+	},
+	"homepage": "https://www.etrax.at"
+}
