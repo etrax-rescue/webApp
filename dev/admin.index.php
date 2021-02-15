@@ -164,7 +164,8 @@ if ($userlevel < 8 && is_numeric($userlevel)) {
 					$username_sha256 = hash("sha256", $iOrg . '-' . $username);
 
 					//PWD auf md5 mit Salt
-					for ($s = '', $j = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') - 1; $j != 32; $x = rand(0, $z), $s .= $a{$x}, $j++);
+					//for ($s = '', $j = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') - 1; $j != 32; $x = rand(0, $z), $s .= $a{$x}, $j++);
+					$s =  random_bytes(32);
 					$str = htmlspecialchars($_POST["i_5"][$i], ENT_QUOTES) . $s;
 					$strmd5 = md5($str);
 					$newpassword = $strmd5 . ':' . $s;

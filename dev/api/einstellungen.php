@@ -16,7 +16,7 @@ require "../include/sessionhandler.php"; //Der Sessionhandler schreibt die Sessi
 
 
 $einsatz_query = $db->prepare("SELECT EID,data,lastupdate FROM settings WHERE EID = ".$EID."");
-$einsatz_query->execute($einsatz_query->errorInfo());
+$einsatz_query->execute() or die(print_r($einsatz_query->errorInfo(), true));
 $einsatz = $einsatz_query->fetch(PDO::FETCH_ASSOC);
 $einsatz_data_json = json_decode(substr(string_decrypt($einsatz['data']), 1, -1));
 $einsatzname = isset($einsatz_data_json->einsatz) ? $einsatz_data_json->einsatz : "";
@@ -60,7 +60,7 @@ $OID_q = "(".$OID_q.")";
 $orginfo_json = '';
 if($USER["lesen"]){ //Mindestens Leserechte werden benötigt um etwas angezeigt zu bekommen.
 	$sql_suchtyp = $db->prepare("SELECT orginfo FROM settings WHERE EID = ".$EID."");
-	$sql_suchtyp->execute($sql_suchtyp->errorInfo());
+	$sql_suchtyp->execute() or die(print_r($sql_suchtyp->errorInfo(), true));
 	while ($sqlsuchtyp = $sql_suchtyp->fetch(PDO::FETCH_ASSOC)){
 		if(!empty($sqlsuchtyp['orginfo'])){
 			//$orginfo_json = json_decode(substr(string_decrypt($sqlsuchtyp['orginfo']), 1, -1),true);
@@ -139,7 +139,7 @@ if($USER["lesen"]){ //Mindestens Leserechte werden benötigt um etwas angezeigt 
 			<?php
 			//Infos zur Organisation (wird auch für Berechtigung genützt)
 			$oidname_query = $db->prepare("SELECT OID,data,orgfreigabe FROM organisation");
-			$oidname_query->execute($oidname_query->errorInfo());
+			$oidname_query->execute() or die(print_r($oidname_query->errorInfo(), true));
 			//Array mit den Organisationsnamen erstellen
 			$oidname = array();
 			while ($roworg = $oidname_query->fetch(PDO::FETCH_ASSOC)){

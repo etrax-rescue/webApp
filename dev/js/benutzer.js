@@ -38,6 +38,7 @@ let Get_Session_vars = function(){
 Get_Session_vars();
 
 jQuery(function() {
+	
 // Mitglied aktivieren und in personen_im_einsatz speichern
 
 	let Mitglied_in_Einsatz_nehmen = function(item){

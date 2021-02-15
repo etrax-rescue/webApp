@@ -1,6 +1,6 @@
 <?php
 $workstation_sql = $db->prepare("SELECT ID,TAN FROM workstations");
-$workstation_sql->execute($workstation_sql->errorInfo());
+$workstation_sql->execute() or die(print_r($workstation_sql->errorInfo(), true));
 while ($row = $workstation_sql->fetch(PDO::FETCH_ASSOC)){
 	$wTAN = $row['TAN'];
 	$wID = $row['ID'];

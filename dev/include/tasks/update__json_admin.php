@@ -10,7 +10,8 @@ if($sql_json[$column] != null){
 foreach ($json_nodes as $key => $value) {
 	if (strstr($key, 'md5_') !== false){ //strikes Hashing nach sha256
 		$key = str_replace("md5_","",$key);
-		for ($s = '', $i = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')-1; $i != 32; $x = rand(0,$z), $s .= $a[$x], $i++); 
+		//for ($s = '', $i = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')-1; $i != 32; $x = rand(0,$z), $s .= $a[$x], $i++); 
+		$s = random_bytes(32);
 		$str = htmlspecialchars($value, ENT_QUOTES).$s;
 		$strmd5 = md5($str);
 		$value = $strmd5.':'.$s;
@@ -59,7 +60,8 @@ if(!empty($values)){ //Sobald die Values nicht leer sind, werden diese upgedated
 	foreach ($values as $name => $val){
 		if (strpos($key, 'md5_') === true){ //strikes Hashing nach sha256
 			$key = str_replace("md5_","",$key);
-			for ($s = '', $i = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')-1; $i != 32; $x = rand(0,$z), $s .= $a[$x], $i++); 
+			//for ($s = '', $i = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')-1; $i != 32; $x = rand(0,$z), $s .= $a[$x], $i++); 
+			$s = random_bytes(32);
 			$str = htmlspecialchars($value, ENT_QUOTES).$s;
 			$strmd5 = md5($str);
 			$value = $strmd5.':'.$s;

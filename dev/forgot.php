@@ -224,7 +224,8 @@ if($p != false || $p_post != false){
 				if($pwdresetkey == $p_post){
 					//neu setzen des Passworts
 					//PWD auf md5 mit Salt
-					for ($s = '', $j = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')-1; $j != 32; $x = rand(0,$z), $s .= $a{$x}, $j++); 
+					//for ($s = '', $j = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')-1; $j != 32; $x = rand(0,$z), $s .= $a{$x}, $j++); 
+					$s = random_bytes(32);
 					$str = $pwd.$s;
 					$strmd5 = md5($str);
 					$newpassword = $strmd5.':'.$s;

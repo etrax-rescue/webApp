@@ -25,7 +25,7 @@
 			<?php
 			if(isset($_SESSION["etrax"]["OID"]) && basename($_SERVER['SCRIPT_NAME']) === 'einsatzwahl.php'){
 				$db_organisation = $db->prepare("SELECT usersync FROM organisation WHERE OID = '".$_SESSION["etrax"]["OID"]."'");
-				$db_organisation->execute($db_organisation->errorInfo());
+				$db_organisation->execute() or die(print_r($db_organisation->errorInfo(), true));
 				
 				while ($result = $db_organisation->fetch(PDO::FETCH_ASSOC)){
 					$usersync = $result['usersync'];

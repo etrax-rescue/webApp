@@ -279,7 +279,8 @@ if($id != false || $id_post != false){
 			
 				
 				//PWD auf md5 mit Salt
-				for ($s = '', $j = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')-1; $j != 32; $x = rand(0,$z), $s .= $a{$x}, $j++); 
+				//for ($s = '', $j = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')-1; $j != 32; $x = rand(0,$z), $s .= $a{$x}, $j++); 
+				$s = random_bytes(32);
 				$str = $syspwd.$s;
 				$strmd5 = md5($str);
 				$newpassword = $strmd5.':'.$s;
@@ -317,13 +318,15 @@ if($id != false || $id_post != false){
 				$pwdx = generate_string($permitted_chars, 12);
 				
 				//Username md5
-				for ($s = '', $j = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')-1; $j != 32; $x = rand(0,$z), $s .= $a{$x}, $j++); 
+				//for ($s = '', $j = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')-1; $j != 32; $x = rand(0,$z), $s .= $a{$x}, $j++); 
+				$s = random_bytes(32);
 				$str = $randusername.$s;
 				$strmd5 = md5($str);
 				$randusername_md5 = $strmd5.':'.$s;
 				
 				//PWD auf md5 mit Salt
-				for ($s = '', $j = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')-1; $j != 32; $x = rand(0,$z), $s .= $a{$x}, $j++); 
+				//for ($s = '', $j = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')-1; $j != 32; $x = rand(0,$z), $s .= $a{$x}, $j++); 
+				$s = random_bytes(32);
 				$str = $pwdx.$s;
 				$strmd5 = md5($str);
 				$newpassword = $strmd5.':'.$s;

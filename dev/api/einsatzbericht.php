@@ -18,7 +18,7 @@ if(isset($_REQUEST['notroot']) && $_REQUEST['notroot'] == 2){
 
 //Infos zur eigenen Organsiation holen
 $db_org = $db->prepare("SELECT OID,data FROM organisation WHERE OID = '".$_SESSION["etrax"]["adminOID"]."'");
-$db_org->execute($db_org->errorInfo());
+$db_org->execute() or die(print_r($db_org->errorInfo(), true));
 $org_arr = array();
 while ($reso = $db_org->fetch(PDO::FETCH_ASSOC)){
 	$data_org_json = json_decode(substr(string_decrypt($reso['data']), 1, -1));
@@ -50,7 +50,7 @@ require $baseURL."include/sessionhandler.php"; //Der Sessionhandler schreibt die
 
 if($USER["lesen"]){ //Mindestens Leserechte werden benötigt um etwas angezeigt zu bekommen.
 	$sql_checkliste = $db->prepare("SELECT einsatzbericht FROM settings WHERE EID = ".$EID."");
-	$sql_checkliste->execute($sql_checkliste->errorInfo());
+	$sql_checkliste->execute() or die(print_r($sql_checkliste->errorInfo(), true));
 	while ($sqlcheckliste = $sql_checkliste->fetch(PDO::FETCH_ASSOC)){
 		if($sqlcheckliste['einsatzbericht']){
 			$einsatzbericht_json = json_decode(substr(string_decrypt($sqlcheckliste['einsatzbericht']), 1, -1));

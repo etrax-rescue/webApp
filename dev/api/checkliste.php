@@ -21,7 +21,7 @@ require $baseURL."include/sessionhandler.php"; //Der Sessionhandler schreibt die
 if($USER["lesen"]){ //Mindestens Leserechte werden benötigt um etwas angezeigt zu bekommen.
 
 	$sql_checkliste = $db->prepare("SELECT checkliste FROM settings WHERE EID = ".$EID."");
-	$sql_checkliste->execute($sql_checkliste->errorInfo());
+	$sql_checkliste->execute() or die(print_r($sql_checkliste->errorInfo(), true));
 	while ($sqlcheckliste = $sql_checkliste->fetch(PDO::FETCH_ASSOC)){
 		if(!empty($sqlcheckliste['checkliste'])){
 			$checkliste_json = json_decode(substr(string_decrypt($sqlcheckliste['checkliste']), 1, -1));

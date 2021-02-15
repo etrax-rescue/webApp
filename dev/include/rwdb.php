@@ -10,6 +10,7 @@ function read_write_db($vars){
 		$select = is_array($vars["select"]) ? $vars["select"] : array("EID" => $vars["select"]);
 		$json_nodes = $vars["json_nodes"];
 		$values = $vars["values"];
+		$decrypt = isset($vars["decrypt"]) ? $vars["decrypt"] : '';
 	}else{
 		echo 'keine vars';
 	}
@@ -20,7 +21,7 @@ function read_write_db($vars){
 		case "update":
 			foreach ($select as $skey => $sentry) {
 				$sql_query= $db->prepare("SELECT $column FROM $table where $skey LIKE $sentry");
-				$sql_query->execute($sql_query->errorInfo());
+				$sql_query->execute() or die(print_r($sql_query->errorInfo()));
 				$sql_json = $sql_query->fetch(PDO::FETCH_ASSOC);
 
 				include("tasks/update__".$type.".php");

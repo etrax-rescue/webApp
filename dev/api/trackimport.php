@@ -10,6 +10,13 @@ $EID = intval($EID);
 require "../../../secure/info.inc.php";
 require "../pdf/coordinates.php";
 
+$token = $ele = "";
+$org_query= $db->prepare("SELECT token FROM organisation WHERE OID LIKE '".$OID."'");
+$org_query->execute() or die(print_r($org_query->errorInfo(), true));
+while ($org_data = $org_query->fetch(PDO::FETCH_ASSOC)){
+	$token = $org_data['token'];
+}
+
 if(isset($gpx) && isset($gruppe)){	
 	$uploaddir = '../gpximport';
 	move_uploaded_file($_FILES['file']['tmp_name'], $uploaddir."/".$gpx);
@@ -35,7 +42,7 @@ if(isset($gpx) && isset($gruppe)){
 								$zeit = str_replace("Z", "", $zeit);
 								$t = ($tzeit != '') ? strtotime($zeit)*1000 : time();
 								$ele = ($ele != '') ? $ele : '268';
-								$insert = $db->prepare("INSERT INTO tracking (EID,UID,OID,lat,lon,timestamp,hdop,altitude,speed,herkunft,nummer,gruppe) VALUES (".$EID.",'".$UID."','".$OID."','".$lat."','".$lon."','".$t."','0','".$ele."','0','GPX','".$nummer."','".$gruppe."')");
+								$insert = $db->prepare("INSERT INTO tracking (EID,UID,OID,lat,lon,timestamp,hdop,altitude,speed,herkunft,nummer,gruppe,token) VALUES (".$EID.",'".$UID."','".$OID."','".$lat."','".$lon."','".$t."','0','".$ele."','0','GPX','".$nummer."','".$gruppe."','".$token."')");
 								$insert->execute() or die(print_r($insert->errorInfo()));
 							}
 						}

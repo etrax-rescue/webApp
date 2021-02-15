@@ -15,7 +15,7 @@ $UID_admin = $_SESSION["etrax"]["UID"];
 $OID_admin = $_SESSION["etrax"]["adminOID"];
 
 $EID_query = $db->prepare("SELECT EID FROM settings ORDER BY EID DESC LIMIT 1");
-$EID_query->execute($EID_query->errorInfo());
+$EID_query->execute() or die(print_r($EID_query->errorInfo(), true));
 while ($row = $EID_query->fetch(PDO::FETCH_ASSOC)){
 $EID = $row['EID'];
 }
@@ -47,7 +47,7 @@ while ($row = $imEinsatz_query->fetch(PDO::FETCH_ASSOC)){
 
 //User aus der DB holen
 $db_mitglieder = $db->prepare("SELECT * FROM user WHERE UID = '".$_SESSION["etrax"]["UID"]."'");
-$db_mitglieder->execute($db_mitglieder->errorInfo());
+$db_mitglieder->execute() or die(print_r($db_mitglieder->errorInfo(), true));
 $user_arr;
 //print_r($db_mitglieder);
 $n_user = 0;
@@ -81,7 +81,7 @@ while ($res_mg = $db_mitglieder->fetch(PDO::FETCH_ASSOC)){
 //$org_sql = $db->prepare("SELECT data, funktionen FROM organisation WHERE OID LIKE '".$UserOID."'");
 //Liste der in einer Organisation vorkommenden Funktionen aufbauen
 $org_sql = $db->prepare("SELECT OID, data, funktionen FROM organisation");
-$org_sql->execute($org_sql->errorInfo());
+$org_sql->execute() or die(print_r($org_sql->errorInfo(), true));
 $oids = array();
 while ($roworg = $org_sql->fetch(PDO::FETCH_ASSOC)){
 	$orgdata_decrypted = json_decode(substr(string_decrypt($roworg['data']), 1, -1));
@@ -174,7 +174,7 @@ require("include/header.html");
 								<?php
 								//Schleife für das array der Organisationen
 								$db_org = $db->prepare("SELECT * FROM organisation WHERE aktiv = 1");
-								$db_org->execute($db_org->errorInfo());
+								$db_org->execute() or die(print_r($db_org->errorInfo(), true));
 								$org_arr_check = array();
 								$n_org = $bundesland_sort = 0;
 								while ($reso_check = $db_org->fetch(PDO::FETCH_ASSOC)){
@@ -249,7 +249,7 @@ require("include/header.html");
 							echo '<button class="btn btn-primary m-4" type="button" id="einsatzneu">neuer Einsatz / neue Übung</button>';
 						}
 						$einsatz_query = $db->prepare("SELECT EID,data,typ FROM settings ORDER BY typ ASC, EID DESC");
-						$einsatz_query->execute($einsatz_query->errorInfo());
+						$einsatz_query->execute() or die(print_r($einsatz_query->errorInfo(), true));
 						$switch_uebung = "";
 						while ($einsaetze = $einsatz_query->fetch(PDO::FETCH_ASSOC)){
 							$einsatztyp = $einsaetze["typ"];

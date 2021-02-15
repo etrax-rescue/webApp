@@ -23,7 +23,7 @@ if(isset($_SESSION["etrax"]["UID"])){
 	if($_SESSION["etrax"]["UID"] != ""){
 		//Userdaten aus DB holen und Session neu schreiben
 		$user_sql = $db->prepare("SELECT EID,OID,UID,FID,username,data FROM user WHERE UID = '".$_SESSION["etrax"]["UID"]."'");
-		$user_sql->execute($user_sql->errorInfo());
+		$user_sql->execute() or die(print_r($user_sql->errorInfo(), true));
 		$rowuser = $user_sql->fetch(PDO::FETCH_ASSOC);
 		$userdata_decrypted = json_decode(substr(string_decrypt($rowuser["data"]), 1, -1));
 		$_SESSION["etrax"]["adminEID"] = $rowuser["EID"];
@@ -60,15 +60,9 @@ if(isset($_SESSION["etrax"]["UID"])){
 					
 				//$einsatz_query = $db->prepare("SELECT OID,Ogleich,Ozeichnen,Ozuweisen,Osehen FROM settings WHERE EID = ".$EID."");
 				$einsatz_query = $db->prepare("SELECT data FROM settings WHERE EID = ".$EID."");
-				$einsatz_query->execute($einsatz_query->errorInfo());
+				$einsatz_query->execute() or die(print_r($einsatz_query->errorInfo(), true));
 				$einsatz = $einsatz_query->fetch(PDO::FETCH_ASSOC);
 				$settings_data_json = json_decode(substr(string_decrypt($einsatz['data']), 1, -1));
-				/*$OID = $einsatz['OID'];
-				$Ogleich = $einsatz['Ogleich'];
-				$Ozeichnen = $einsatz['Ozeichnen'];
-				$Ozuweisen = $einsatz['Ozuweisen'];
-				$Osehen = $einsatz['Osehen'];
-				*/
 				if($settings_data_json != ''){
 					$OID = $settings_data_json->OID;
 					$Ogleich = $settings_data_json->Ogleich;

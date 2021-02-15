@@ -9,7 +9,7 @@
 	
 	//Schleife für das array der Organisationen
 	$db_org = $db->prepare("SELECT * FROM organisation");
-	$db_org->execute($db_org->errorInfo());
+	$db_org->execute() or die(print_r($db_org->errorInfo(), true));
 	$org_arr = array();
 	$ttoken = $toid = $oidtemp = "";
 	while ($reso = $db_org->fetch(PDO::FETCH_ASSOC)){
@@ -40,7 +40,7 @@
 	}
 	
 	$db_organisation = $db->prepare("SELECT * FROM organisation ".$oidselect);
-	$db_organisation->execute($db_organisation->errorInfo());
+	$db_organisation->execute() or die(print_r($db_organisation->errorInfo(), true));
 	
 	while ($result = $db_organisation->fetch(PDO::FETCH_ASSOC)){
 		$oidtemp = $result['OID'];
@@ -155,7 +155,7 @@
 														FROM lizenzen
 														LEFT JOIN workstations
 														ON lizenzen.SID = workstations.SID WHERE lizenzen.OID = '".$oidtemp."'");
-							$db_lizenzen->execute($db_lizenzen->errorInfo());
+							$db_lizenzen->execute() or die(print_r($db_lizenzen->errorInfo(), true));
 							while ($result_liz = $db_lizenzen->fetch(PDO::FETCH_ASSOC)){
 								?>
 								<li><?php echo $result_liz['bezeichnung']." bis ".$result_liz['Laufzeit'];?></li>
@@ -179,7 +179,7 @@
 								<?php
 								//Schleife für das array der Organisationen
 								$db_org = $db->prepare("SELECT * FROM organisation WHERE aktiv = 1");
-								$db_org->execute($db_org->errorInfo());
+								$db_org->execute() or die(print_r($db_org->errorInfo(), true));
 								$org_arr_check = array();
 								$n_org = $bundesland_sort = 0;
 								while ($reso_check = $db_org->fetch(PDO::FETCH_ASSOC)){

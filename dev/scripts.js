@@ -322,7 +322,7 @@ let basiskarte,
 		if(i == 0){
 			basiskarte = b_karte,
 			defaultmap = val.name,
-			printMap = val.kartenname.toLowerCase();//Definiert den Namen der Basiskarte für den Ausdruck, wird durch die Kartenwahl geändert
+			printMap = val.printname;//Definiert den Namen der Basiskarte für den Ausdruck, wird durch die Kartenwahl geändert
 		}
 		jQuery('#mainNav .navbar-nav .basiskarten').append('<a href="#" class="dropdown-item changeMap" data-layer="'+ val.name +'" data-printlayer="'+ val.printname +'">'+ val.kartenname +'</a>');
 	});
@@ -1293,13 +1293,13 @@ function showmap(){
 	});
 	
 	// Einfügen der Usertracks als json
-	var usertracks = function(feature) {
-		var coordinates = feature.getGeometry().getCoordinates()[0];
-		var len = coordinates.length;
-		if (len > 0) {
+	let usertracks = function(feature) {
+		let coordinates = feature.getGeometry().getCoordinates()[0];
+		let len = coordinates.length;
+		if (len > 0) {console.log(len);
 			coordinates = coordinates.slice(0,1);
 		}
-		var tstyles;
+		let tstyles;
 		if(feature.get('strokewidth') != 0){
 			tstyles = [
 				new Style({
@@ -1314,7 +1314,8 @@ function showmap(){
 						anchorXUnits: 'fraction',
 						anchorYUnits: 'pixels',
 						color: feature.get('strokecolor'),
-						src: feature.get('img')
+						src: feature.get('img'),
+						opacity: feature.get('opacity')
 					}),
 					geometry: function() {
 						return new MultiPoint(coordinates);
@@ -1330,7 +1331,8 @@ function showmap(){
 						anchorYUnits: 'pixels',
 						color: feature.get('strokecolor'),
 						imgSize: [20, 20],
-						src: feature.get('img')
+						src: feature.get('img'),
+						opacity: feature.get('opacity')
 					}),
 					geometry: function() {
 						return new MultiPoint(coordinates);
@@ -1356,7 +1358,7 @@ function showmap(){
 		});
 		
 	};
-	let loadTracks = function(){console.log('trackssource');
+	/*let loadTracks = function(){console.log('trackssource');
 		let trackssource = new VectorSource({
 			format: new GeoJSON(),
 			loader: function(extent, resolution, projection){
@@ -1384,7 +1386,7 @@ function showmap(){
 				xhr.send();
 			}
 		});
-	};
+	};*/
 	
 	let tracks = new VectorLayer({
 		declutter: true,
@@ -3050,60 +3052,56 @@ function showmap(){
 	});
 	
 	// BOS/APP Pushbenachrichtigungen
-	let Pushnachrichten_anzeigen = function(data){
-		let message = "";
-		let notification_title = "";
-		let notification_text = "";
-		let message_data = JSON.parse(data);
-		jQuery(message_data).each(function(i,val){
-				if(!val.data[0].read && val.data[0].oid == oid){
-					message += "<div id='bosmessage-"+val.data[0].id+"' class='bos-message mb-2'>";
-					message += "<div class='h4'>"+val.data[0].betreff+"</div>";
-					message += "<div class='text'>"+val.data[0].text+"</div>";
-					message += "<div class='text'>"+val.data[0].name+"<br>TEL:"+val.data[0].phone+", BOS:"+val.data[0].bos+"</div>";
-					message += "<div class='small'>"+val.data[0].zeit+"</div>";
-					message += '<button type="button" data-id="'+val.id+'" data-name="'+val.data[0].name+'" class="btn btn-success markasread">gelesen</button>';
-					message += '<div class="clearfix border-bottom mt-2"></div>';
-					message += "</div>";
-					notification_title = val.data[0].kurztext;
-					notification_text += val.data[0].name+" [TEL:"+val.data[0].phone+", BOS:"+val.data[0].bos+"] "+val.data[0].text+" um "+val.data[0].zeit;
-				}
-		});
-		
-		//Desktop notification not in user
-		/*if(notification_title != "" && notification_text != ""){
-			if(Notification.permission === "granted") {
-				let notification = new Notification(notification_title, { body: notification_text });
-			}
-			else if(Notification.permission !== "denied") {
-				Notification.requestPermission().then(function (permission) {
-					if(permission === "granted") {
-						let notification = new Notification(notification_title, { body: notification_text });
+	let read_messages = function(){
+		let Pushnachrichten_anzeigen = function(data){
+			let message = "";
+			let notification_title = "";
+			let notification_text = "";
+			let message_data = JSON.parse(data);
+			jQuery(message_data).each(function(i,val){
+					if(!val.data[0].read && val.data[0].oid == oid){
+						message += "<div id='bosmessage-"+val.data[0].id+"' class='bos-message mb-2'>";
+						message += "<div class='h4'>"+val.data[0].betreff+"</div>";
+						message += "<div class='text'>"+val.data[0].text+"</div>";
+						message += "<div class='small'>"+val.data[0].zeit+"</div>";
+						message += '<button type="button" data-id="'+val.id+'" data-name="'+val.data[0].name+'" class="btn btn-success markasread">gelesen</button>';
+						message += '<div class="clearfix border-bottom mt-2"></div>';
+						message += "</div>";
+						notification_title = val.data[0].kurztext;
+						notification_text += val.data[0].name+" [TEL:"+val.data[0].phone+", BOS:"+val.data[0].bos+"] "+val.data[0].text+" um "+val.data[0].zeit;
 					}
-				});
+			});
+			
+			jQuery('#alertdiv').html(message);
+			if(message){
+				jQuery('.alertmodal').modal('show');
+				POIs_anzeigen();
+			}else{
+				jQuery('.alertmodal').modal('hide');
 			}
-		}*/
-		
-		jQuery('#alertdiv').html(message);
-		if(message){
-			jQuery('.alertmodal').modal('show');
-		}else{
-			jQuery('.alertmodal').modal('hide');
 		}
-	}
-	let Pushbenachrichtigung_aktivieren = function(){
-		database_call('settings','read','json','protokoll',{EID: eid},'','',Pushnachrichten_anzeigen,true);
+		jQuery.ajax({
+			url: root+readpath+"readstatus.php",
+			type: "post",
+			data: {
+				EID: eid,
+				trackstart: trackstart,
+				UID: uid
+			}
+		}).done(function(){
+			database_call('settings','read','json','protokoll',{EID: eid},'','',Pushnachrichten_anzeigen,true);
+		});
 	}
 	
+	read_messages();
+	
 	if(!anreise){
-		setInterval(function(){
-			database_call('settings','read','json','protokoll',{EID: eid},'','',Pushnachrichten_anzeigen,true)},
-			alertloading);
+		setInterval(function(){read_messages()},alertloading);
 	}
 	
 	let Nachricht_als_gelesen_markieren = function(that){
 		let message = $('bosmessage-'+that.attr('data-id')).html();
-		database_call('settings','update','json_update','protokoll',{EID: eid},that.attr('data-id'),{'read': true},Pushbenachrichtigung_aktivieren,false);
+		database_call('settings','update','json_update','protokoll',{EID: eid},that.attr('data-id'),{'read': true},read_messages,false);
 	}
 		
 	jQuery(".alertmodal #alertdiv").on("click",".markasread",function () {

@@ -6,7 +6,8 @@ $and = $comma = $value = "";
 foreach ($values as $name => $val){
 	if (strpos($name, 'md5_') !== false){
 		$name = str_replace("md5_","",$name);
-		for ($s = '', $i = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')-1; $i != 32; $x = rand(0,$z), $s .= $a[$x], $i++); 
+		//for ($s = '', $i = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')-1; $i != 32; $x = rand(0,$z), $s .= $a[$x], $i++); 
+		$s = random_bytes(32);
 		$str = htmlspecialchars($val, ENT_QUOTES).$s;
 		$strmd5 = md5($str);
 		$v = $strmd5.':'.$s;

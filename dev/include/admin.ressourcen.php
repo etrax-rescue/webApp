@@ -2,7 +2,7 @@
 <?php 
 //if($userlevel > 0){$oidselect = "WHERE OID = '".$OID."'";} else {$OID = "";}
 $db_organisation = $db->prepare("SELECT OID, data, usersync, funktionen FROM organisation ".$oidselect);
-$db_organisation->execute($db_organisation->errorInfo());
+$db_organisation->execute() or die(print_r($db_organisation->errorInfo(), true));
 
 while ($result = $db_organisation->fetch(PDO::FETCH_ASSOC)){
 	$data_org_json = json_decode(substr(string_decrypt($result['data']), 1, -1));
@@ -37,7 +37,7 @@ while ($result = $db_organisation->fetch(PDO::FETCH_ASSOC)){
 		<?php  		// Ressourcen Anzeigen
 					//Ressourcen aus der DB holen
 					$db_res = $db->prepare("SELECT * FROM ressourcen WHERE OID = '".$oid_temp."' ORDER BY typ ASC");
-					$db_res->execute($db_res->errorInfo());
+					$db_res->execute() or die(print_r($db_res->errorInfo(), true));
 					$res_arr = array();
 					//print_r($db_mitglieder);
 					$n_res = 0;

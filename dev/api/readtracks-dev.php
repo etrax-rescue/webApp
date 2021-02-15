@@ -19,6 +19,7 @@ $counterBOS = false;
 
 
 $hiddentracks = isset($_SESSION["etrax"]["hiddentracks"]) ? $_SESSION["etrax"]["hiddentracks"] : [];
+//print_r($hiddentracks);
 
 function entfernung($lat, $lon, $lastlat, $lastlon){
 	$utm = ll2utm($lat,$lon);
@@ -48,6 +49,7 @@ function MitgliederimEinsatz(){
 			$json = string_decrypt($sql_json['gruppen']);
 			$gruppen_infos = json_decode($json, true);
 			foreach($gruppen_infos as $groups){
+					//array_push($EinsatzGruppen, $groups);
 					$EinsatzGruppen[$groups["id"]] = $groups;
 			}
 			if($sql_json['personen_im_einsatz'] != null){
@@ -55,7 +57,7 @@ function MitgliederimEinsatz(){
 				$UserimEinsatz = json_decode($json, true);
 				foreach($UserimEinsatz as $user){
 					foreach($user['data'] as $userdata){
-						//Wenn der User keiner Gruppe zugewiesen ist, nicht abgemeldet und nicht in Pause ist!
+						//if($userdata['gruppe'] != '' && $userdata['gruppe'] != '0' && $userdata['abgemeldet'] == '' && ($userdata['inPause'] == '' || ($userdata['inPause'] != '' && $userdata['ausPause'] != '') )){ //Wenn der User keiner Gruppe zugewiesen ist, nicht abgemeldet und nicht in Pause ist!
 						if($userdata['gruppe'] != '' && ($userdata['gruppe'] != '0' || isset($userdata['zugewiesen'])) && $userdata['abgemeldet'] == '' && ($userdata['inPause'] == '' || ($userdata['inPause'] != '' && $userdata['ausPause'] != '') )){ //Wenn der User einer Gruppe zugewiesen ist bzw. wenn die Gruppe 0 (keine Zuweiseung) ist,d ann muss der User schon mal zugewiesen gewesen sein. Ist der Pausenwert , nicht abgemeldet und nicht in Pause ist!
 							array_push($GPStracker, $user['data'][0]);
 						}
@@ -98,7 +100,7 @@ foreach ($GPStracker as $key => $userdata) {
 		$UID = $userdata['UID'];
 		$sender = $userdata['sender'];
 		$DNR = $userdata['dienstnummer'];
-		$groupID = $userdata['gruppe'];
+		$groupID = $userdata['gruppe'];//$EinsatzGruppen[$rGID]['data'][0]['id'];
 		$rGID = intval($userdata['gruppe']) - 1;
 		$counterBOS = true;
 		//Auswahl der Trackingdaten, die fehlende EID, OID, UID oder gruppen Werte haben.
@@ -108,8 +110,11 @@ foreach ($GPStracker as $key => $userdata) {
 			$usertracks = $db->prepare("SELECT ID,EID,OID,UID,lon,lat,timestamp,timestamp_server,herkunft,speed,gruppe,nummer,token FROM tracking WHERE timestamp > ".$trackingbeginn." AND ((UID LIKE '".$UID."') OR (nummer LIKE '".$DNR."')) AND CONVERT(hdop,UNSIGNED INTEGER) < 70 ORDER BY timestamp DESC");
 		}
 		$usertracks->execute() or die(print_r($usertracks->errorInfo(), true));
+		
 		$track_loop = 0;
 		while ($rowtracks = $usertracks->fetch(PDO::FETCH_ASSOC)){
+			
+			//$track_timestamp = $rowtracks['timestamp']/1000;
 			//Trackingdaten die über die BOS Schnittstelle kommen, haben keine EID, OID und UID. Diese wird hier vergeben
 			if($rowtracks['herkunft'] == "BOS"){
 				if(empty($rowtracks['EID']) || $rowtracks['EID']== 0){
@@ -162,12 +167,16 @@ foreach ($EinsatzGruppen as $key => $egroup) {
 		$uid_t = $uid_t["UID"]; //UID eines Mitglieds in der Gruppe, für das Trackingdaten in der table liegen
 		//Userinformation aus der Liste aller am Einsatz beteiligten User holen:
 		if(isset($userdata_arr[$uid_t])){
+			//echo "<br>Line 170: uid_t: ".$uid_t." ".$key."<br>";
 					
 			$userdata = $userdata_arr[$uid_t];
 		
 	
+			//print_r($GPStracker);
 			$trackheader = $trackcoords = $comma = $BOSnr = $Username = $Usertel = $OID = $UID = $sender = $DNR = $aktivierungszeit = $rGID = $group_name = $groupID = $group_status = '';
 			//Überprüfen ob die Tracker Gruppen zugewiesen sind
+			//echo "<br> User Gruppe: ".$userdata['gruppe'];
+			//if(intval($userdata['gruppe'])){
 		
 			$BOSnr = (isset($userdata['bos']) && $userdata['bos'] != "") ? $userdata['bos'] : "";
 			$Username = $userdata['name'];
@@ -175,6 +184,7 @@ foreach ($EinsatzGruppen as $key => $egroup) {
 			$OID = $userdata['OID'];
 			$UID = $userdata['UID'];
 			$sender = $userdata['sender'];
+			//echo "<br>Line 186: sender: ".$sender."<br>";
 			$status = $userdata['status'];
 			$DNR = $userdata['dienstnummer'];
 			$aktivierungszeit = $userdata['aktivierungszeit'];
@@ -196,107 +206,109 @@ foreach ($EinsatzGruppen as $key => $egroup) {
 			}
 			
 			$counterBOS = true;
-			$opacity = 1;
 			
+			//Layer baut die einzelnen Usertracks auf auf
 			// Nur Tracks nach der Aktivierung des Users und seit Einsatzbeginn werden angezeigt
-			$in_token = '("' . implode('","', $token) .'")';
-			$usertracks = $db->prepare("SELECT lon,lat,timestamp,herkunft FROM tracking WHERE EID LIKE $EID AND lon NOT LIKE '' AND lat NOT LIKE '' AND herkunft IN ('APP','GPX','BOS') AND token IN " . $in_token . " AND timestamp > ".$trackingbeginn." AND ((UID LIKE '".$UID."')) AND CONVERT(hdop,UNSIGNED INTEGER) < 70 AND gruppe = '".$groupID."' ORDER BY timestamp DESC");
+			// und von Usern die active Tracker sind 
+			if($sender == 'active'){
+				
+				$opacity = 0.5;
+				$in_token = '("' . implode('","', $token) .'")';
+				$usertracks = $db->prepare("SELECT lon,lat,timestamp FROM tracking WHERE EID LIKE $EID AND lon NOT LIKE '' AND lat NOT LIKE '' AND herkunft IN ('APP','GPX','BOS') AND token IN " . $in_token . " AND timestamp > ".$trackingbeginn." AND speed <= '".$maxspeed."' AND ((UID LIKE '".$UID."')) AND CONVERT(hdop,UNSIGNED INTEGER) < 70 AND gruppe = '".$groupID."' ORDER BY timestamp DESC");
+			
+				$usertracks->execute() or die(print_r($usertracks->errorInfo(), true));
+				$track_loop = 0;
+				
+				$usertrackcount = $usertracks->rowCount();
+				$track_counter = 0;
 
-			$usertracks->execute() or die(print_r($usertracks->errorInfo(), true));
-			$track_loop = 0;
-			$usertrackcount = $usertracks->rowCount();
-			$track_counter = 0;
-			while ($rowtracks = $usertracks->fetch(PDO::FETCH_ASSOC)){
-				$track_counter += 1;
-				
-				$track_timestamp = $rowtracks['timestamp']/1000;
-				
-				// und von Usern die active Tracker sind
-				if($sender == 'active'){
+				while ($rowtracks = $usertracks->fetch(PDO::FETCH_ASSOC)){
+					$track_counter += 1;
+					
+					$timediff = $tlat = $tlon = $gruppe = $gpxtrackcolor = "";
+					$gruppe = $group_name;
+					$tlat =  $rowtracks['lat'];
+					$tlon =  $rowtracks['lon'];
+
+					$track_timestamp = $rowtracks['timestamp']/1000;
+					$pointtime = date('H:i d.m.Y', $track_timestamp);
+					$tracktime = date('d.m.y H:i', $track_timestamp);
+					$timediff = $lasttstamp - $track_timestamp;// Zeit zwischen dem letzen Track und dem Aktuellen in Sekunden
+					$entfernung = entfernung($tlat, $tlon, $lastlat, $lastlon);// Funktion entfernung berechnet die Entfernung in Metern
+									
 					$trackcolor = isset($EinsatzGruppen[$groupID]['data'][0]['color']) ? $EinsatzGruppen[$groupID]['data'][0]['color'] : "#FF3333";
 					$trackend ='
 					]]}}';
-					$timediff = $tlat = $tlon = $gruppe = $gpxtrackcolor = "";
-
-					$tlat =  $rowtracks['lat'];
-					$tlon =  $rowtracks['lon'];
 					
 					
-						$gruppe = $group_name;
-
-						$pointtime = date('H:i d.m.Y', $track_timestamp);
-						$tracktime = date('d.m.y H:i', $track_timestamp);
-						$timediff = $lasttstamp - $track_timestamp;// Zeit zwischen dem letzen Track und dem Aktuellen in Sekunden
-						
-						$entfernung = entfernung($tlat, $tlon, $lastlat, $lastlon);// Funktion entfernung berechnet die Entfernung in Metern
-						$speed = $timediff == 0 ? "0" : $speed = $entfernung/$timediff;
-
-						//neuen Track beginnen
-						if(($entfernung < ($timediff*$maxspeed) && $speed <= $maxspeed && $entfernung <= 150 && $timediff <= $trackpause &&  $rowtracks['herkunft'] != 'GPX') || $rowtracks['herkunft'] == 'GPX'){ //Die maximale Entfernung zwischen Punkten ist jetzt mit 150m fixiert; Bei importierten GPX Tracks wird nur auf die maximale Geschwindigkeit gefiltert, da der Track normalerweise sehr gut und hochauflösend ist.
-						
-							if($counterBOS){
-								$counterBOS = false;
-								if($loop > 0){
-									$gpxtracks_temp .= '
-									]]}},';
-									if($track_loop >= $minpunkte){
-										$gpxtracks .= $gpxtracks_temp;
-										$gpxtracks_temp = "";
-										$track_loop = 0;
-									} else {
-										$gpxtracks_temp = "";
-										$track_loop = 0;
-									}
-									
-								} 	
-								$loop = 0;
-								$sw =  (in_array($trackNr, $hiddentracks)) ? 0 : $strokewidth;
-								$gpxtracks_temp .= '{
-									"type": "Feature",
-									"properties": {
-										"tracknr": "'.$trackNr.'",
-										"time": "'.$pointtime.'",
-										"name": "<b style=color:'.$trackcolor.'>'.$userdata['name'].$ausbildung.'</b>",
-										"uid": "'.$UID.'",
-										"gid": "'.$groupID.'",
-										"id": "'.$group_name.'",
-										"strokewidth": "'.$sw.'",
-										"strokecolor": "'.$trackcolor.'",
-										"opacity": "'.$opacity.'",
-										"tracklon": "'.$tlon.'",
-										"tracklat": "'.$tlat.'",
-										"speed": "'.$speed.'",
-										"trackloop": "'.$track_loop.'",
-										"trackloop_var": "'.$minpunkte.'",
-										"img": "'.$track_icon.'",
-										"beschreibung": "<b style=color:'.$trackcolor.'>Track '.$trackNr.' mit '.$group_name.'</b><br>DNR: '.$DNR.'<br>BOS: '.$BOSnr.'<br><small>'.$tracktime.'</small>"
-									},
-									"geometry": {
-									"type": "MultiLineString",
-									"coordinates": [
-										[
-								';
-									$gpxtracks_temp .= '['.$tlon.', '.$tlat.']';
-									$trackNr++;
-									$track_loop++;
-									$opacity = 0;
-							}else{
-								$gpxtracks_temp .=',
-									['.$tlon.', '.$tlat.']';
-									$track_loop++;
+					
+					$speed = $timediff == 0 ? "0" : $speed = $entfernung/$timediff;
+					//neuen Track beginnen
+					if($entfernung < ($timediff*$maxspeed) && $entfernung <= 150 && $timediff <= $trackpause){ //Die maximale Entfernung zwischen Punkten ist jetzt mit 150m fixiert; Bei importierten GPX Tracks wird nur auf die maximale Geschwindigkeit gefiltert, da der Track normalerweise sehr gut und hochauflösend ist.
+						if($counterBOS){// Header für den Track schreiben
+							$counterBOS = false;
+							if($loop > 0){
+								$gpxtracks_temp .= '
+								]]}},';
+								if($track_loop >= $minpunkte){
+									$gpxtracks .= $gpxtracks_temp;
+									$gpxtracks_temp = "";
+									$track_loop = 0;
+								} else {
+									$gpxtracks_temp = "";
+									$track_loop = 0;
+								}
 							}
-						}else if($counterBOS === false){
-							$counterBOS = true;
-							$loop = 1;
-							
-						}	
-						$lastlon = $tlon;
-						$lastlat = $tlat;
-						$lasttstamp = $track_timestamp;
-						
+							$loop = 0;
+							$sw =  (in_array($trackNr, $hiddentracks)) ? 0 : $strokewidth;
+							$gpxtracks_temp .= '{
+								"type": "Feature",
+								"properties": {
+									"tracknr": "'.$trackNr.'",
+									"time": "'.$pointtime.'",
+									"name": "<b style=color:'.$trackcolor.'>'.$userdata['name'].$ausbildung.'</b>",
+									"uid": "'.$UID.'",
+									"gid": "'.$groupID.'",
+									"id": "'.$group_name.'",
+									"strokewidth": "'.$sw.'",
+									"strokecolor": "'.$trackcolor.'",
+									"opacity": "'.$opacity.'",
+									"tracklon": "'.$tlon.'",
+									"tracklat": "'.$tlat.'",
+									"speed": "'.$speed.'",
+									"trackloop": "'.$track_loop.'",
+									"trackloop_var": "'.$minpunkte.'",
+									"img": "'.$track_icon.'",
+									"beschreibung": "<b style=color:'.$trackcolor.'>Track '.$trackNr.' mit '.$group_name.'</b><br>DNR: '.$DNR.'<br>BOS: '.$BOSnr.'<br><small>'.$tracktime.'</small>"
+								},
+								"geometry": {
+								"type": "MultiLineString",
+								"coordinates": [
+									[
+							';
+							$gpxtracks_temp .= '['.$tlon.', '.$tlat.']';
+							$trackNr++;
+							$track_loop++;
+						}else{// Koordinaten schreiben
+							$gpxtracks_temp .=',
+							['.$tlon.', '.$tlat.']';
+							$track_loop++;
+						}
+
+					}else if($counterBOS === false){
+						$counterBOS = true;
+						$loop = 1;
+					}
+					$lastlon = $tlon;
+					$lastlat = $tlat;
+					$lasttstamp = $track_timestamp;
+
 					if($counterBOS === false){
 						$loop = 1;
 						
+					}
+					if($usertrackcount==$track_counter){
+						$gpxtracks_temp = str_replace('"opacity": "0.3"','"opacity": "1"',$gpxtracks_temp);
 					}
 				}
 			}

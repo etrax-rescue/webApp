@@ -8,7 +8,7 @@ if(isset($_SESSION["etrax"]["UID"]) && isset($_SESSION["etrax"]["EID"])) { //red
 	header('Location: einsatzwahl.php');
 }
 $_SESSION['stillworking'] = time();
-$_SESSION["etrax"]["strokewidth"] = isset($_SESSION["etrax"]["strokewidth"]) ? $_SESSION["etrax"]["strokewidth"] : 2;
+$_SESSION["etrax"]["strokewidth"] = isset($_SESSION["etrax"]["strokewidth"]) ? $_SESSION["etrax"]["strokewidth"] : 1;
 
 require_once './vendor/autoload.php';
 use Ahc\Jwt\JWT;
@@ -205,7 +205,7 @@ include("include/header.html");
 					<?php $host = explode(".", $_SERVER['HTTP_HOST']); 
 					$subname = ($host[0] == "www" || $host[0] == "") ? "app" : "app".$host[0];
 					?>
-					<img id="appqr" src="https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=<?php echo "https://".$subname.".".$host[1].".".$host[2]; ?>" alt="QR-Code mit App-Schnittstellen URL">
+					<!--img id="appqr" src="https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=<?php echo "https://".$subname.".".$host[1].".".$host[2]; ?>" alt="QR-Code mit App-Schnittstellen URL"-->
 				</div>
 			</div>
 		</div>
@@ -230,7 +230,7 @@ include("include/header.html");
 								<?php
 								
 								$org_sql = $db->prepare("SELECT OID,data FROM organisation WHERE aktiv = 1");
-								$org_sql->execute($org_sql->errorInfo());
+								$org_sql->execute() or die(print_r($org_sql->errorInfo(), true));
 								while ($roworg = $org_sql->fetch(PDO::FETCH_ASSOC)){
 									$orgdata_decrypted = json_decode(substr(string_decrypt($roworg["data"]), 1, -1));
 									echo '<option value="'.$roworg["OID"].'">'.$orgdata_decrypted->kurzname.'</option>';
@@ -281,7 +281,7 @@ include("include/header.html");
 								<?php
 								
 								$org_sql = $db->prepare("SELECT OID,data FROM organisation WHERE aktiv = 1");
-								$org_sql->execute($org_sql->errorInfo());
+								$org_sql->execute() or die(print_r($org_sql->errorInfo(), true));
 								while ($roworg = $org_sql->fetch(PDO::FETCH_ASSOC)){
 									$orgdata_decrypted = json_decode(substr(string_decrypt($roworg["data"]), 1, -1));
 									echo '<option value="'.$roworg["OID"].'">'.$orgdata_decrypted->kurzname.'</option>';

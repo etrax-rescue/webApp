@@ -69,8 +69,8 @@ $OID_q = "(" . $OID_q . ")";
 if ($_SESSION["etrax"]["userrechte"] <= 5) { //Mindestens Leserechte werden benötigt um etwas angezeigt zu bekommen.
 
 	//Infos zur Organisation (wird auch für Berechtigung und setzen der Einheiten genützt)
-	$oidname_query = $db->prepare("SELECT OID,data,orgfreigabe,einheiten  FROM organisation");
-	$oidname_query->execute($oidname_query->errorInfo());
+	$oidname_query = $db->prepare("SELECT OID,data,orgfreigabe,einheiten FROM organisation");
+	$oidname_query->execute() or die(print_r($oidname_query->errorInfo(), true));
 	//Array mit den Organisationsnamen erstellen
 	$oidname = array();
 	while ($roworg = $oidname_query->fetch(PDO::FETCH_ASSOC)) {

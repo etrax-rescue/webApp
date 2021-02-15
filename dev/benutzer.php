@@ -48,7 +48,7 @@ $OID_q = "(" . $OID_q . ")";
 
 //Infos zur Organisation (wird auch für Berechtigung genützt)
 $oidname_query = $db->prepare("SELECT OID,data,orgfreigabe,funktionen FROM organisation");
-$oidname_query->execute($oidname_query->errorInfo());
+$oidname_query->execute() or die(print_r($oidname_query->errorInfo()));
 //Array mit den Organisationsnamen erstellen
 $oidname = [];
 $oid_list = [];
@@ -143,37 +143,20 @@ include("include/header.html");
 						}
 
 						//Trackinguser finden
-						$activetracker = [];
 						$trackerNum = [];
 						function trackingUser()
 						{
-							global $db, $activetracker, $trackerNum;
-							$GPStracker = [];
-							$query_tracker = $db->prepare("SELECT UID,nummer,altitude,timestamp_server,hdop FROM tracking WHERE EID LIKE ? GROUP BY UID");
+							global $db, $trackerNum;
+							$query_tracker = $db->prepare("SELECT UID FROM tracking WHERE EID LIKE ? GROUP BY UID");
 							$query_tracker->bindParam(1, $_SESSION["etrax"]["EID"], PDO::PARAM_STR);
 							$query_tracker->execute();
-							//ErrorInfo
-							$errorInfo = $query_tracker->errorInfo();
-							echo strlen($errorInfo[2]) > 0 ? ("<br><b>MySQL Error:</b> ".$errorInfo[2]) : "";
 							
 							while ($result = $query_tracker->fetch(PDO::FETCH_ASSOC)) {
-								$iconGPS = (floatval($result['altitude']) == 0) ?
-									"<i class='material-icons red' title='GPS deaktiviert'>location_off</i>" :
-									"<i class='material-icons green' title='GPS aktiviert'>location_on</i>";
-
-								$GPStrackerdata = $iconGPS . " " . $result['UID'] . " " . $result['nummer'] . " [" . $result['hdop'] . "]";
-								array_push($GPStracker, $GPStrackerdata);
 								array_push($trackerNum, $result['UID']);
 							}
-							$activetracker = array_unique($GPStracker);
-							return $activetracker;
 						}
 						trackingUser();
 
-						//User im Einsatz holen
-						$pie = [];
-						$piedienstnummer = [];
-						$pieEID = [];
 						$UserimEinsatz = [];
 						function MitgliederimEinsatz()
 						{
@@ -194,26 +177,6 @@ include("include/header.html");
 							return $UserimEinsatz;
 						}
 						MitgliederimEinsatz();
-
-						function MitgliederinallenEinsaetzen()
-						{
-							global $db, $piedienstnummer, $pieEID, $EID, $pie;
-							$sql_query = $db->prepare("SELECT UID,aktiveEID FROM user WHERE aktiveEID NOT LIKE ? AND aktiveEID NOT LIKE ''");
-							$sql_query->bindParam(1, $EID, PDO::PARAM_STR);
-							$sql_query->execute();
-							//ErrorInfo
-							$errorInfo = $sql_query->errorInfo();
-							echo strlen($errorInfo[2]) > 0 ? ("<br><b>MySQL Error:</b> ".$errorInfo[2]) : "";
-							
-							while ($sql_json = $sql_query->fetch(PDO::FETCH_ASSOC)) {
-								$piedienstnummer = $sql_json['UID'];
-								$pieEID = $sql_json['aktiveEID'];
-								$pie[] = ['UID' => $piedienstnummer, 'aktiveEID' => $pieEID];
-							}
-
-							return $pie;
-						}
-						MitgliederinallenEinsaetzen();
 
 						$tooltip_text = $EIDaktuell = $EID;
 						$s = [];
@@ -263,7 +226,7 @@ include("include/header.html");
 											$org = $m_typ;
 											array_push($Material_im_Einsatz, $m_UID);
 										}
-										if ($m_status >= 3) {
+										if ($m_status >= 3 && $m_status != 10 && $m_status != 11) {
 											$bos = ($m_bos) ? "<br>BOS: " . $m_bos : '';
 											$phone = ($m_phone) ? "<br>TEL: " . $m_phone : '';
 											$tooltip_text = $oidname[$m_OID]['kurzname'] . "<br>" . $m_typ . " " . $m_dienstnummer . " " . $sendet_txt . $bos . $phone;
@@ -273,7 +236,7 @@ include("include/header.html");
 											array_push($User_im_Einsatz, $ist_im_Einsatz);
 										}
 									} elseif ($m_status == 9) {
-										$ist_in_Pause = "<li data-toggle='tooltip' data-html='true' data-placement='left' title='" . $tooltip_text . "' class='btn " . $buttontype . " list-group-item mt-2 w-100 d-flex" . $sendet . "' data-uid='" . $m_UID . "' data-oid='" . $org . "' data-typ='" . $m_typ . "' data-dienstnummer='" . $m_dienstnummer . "' data-ausbildungen='" . $m_ausbildungen . "' data-name='" . $m_name . "' data-bos='" . $m_bos . "' data-phone='" . $m_phone . "' data-pause='" . $m_pause . "' data-sendet='" . $ist_sender . "' data-oldEID='" . $EID . "' data-externorganisation='" . $EID . "'" . $sendet_txt . ">" . $arrowleft . "<span class='user'>" . $m_name . " ".$m_status. "<span class='badge badge-info ml-1'>" . $m_typ . "</span></span></li>\n";
+										$ist_in_Pause = "<li data-toggle='tooltip' data-html='true' data-placement='left' title='" . $tooltip_text . "' class='btn " . $buttontype . " list-group-item mt-2 w-100 d-flex" . $sendet . "' data-uid='" . $m_UID . "' data-oid='" . $org . "' data-typ='" . $m_typ . "' data-dienstnummer='" . $m_dienstnummer . "' data-ausbildungen='" . $ausbildungen . "' data-name='" . $m_name . "' data-bos='" . $m_bos . "' data-phone='" . $m_phone . "' data-pause='" . $m_pause . "' data-sendet='" . $ist_sender . "' data-oldEID='" . $EID . "' data-externorganisation='" . $EID . "'" . $sendet_txt . ">" . $arrowleft . "<span class='user'>" . $m_name . "<span class='badge badge-info ml-1'>" . $m_typ . "</span></span></li>\n";
 										array_push($User_in_Pause, $ist_in_Pause);
 									}
 								}
@@ -281,7 +244,6 @@ include("include/header.html");
 						}
 
 						// User aus DB holen neu PT 2020-05-01
-						//$db_mitglieder = $db->prepare("SELECT OID,UID,data,EID FROM user WHERE ".$OID_q." ORDER BY OID ASC");
 						$db_mitglieder = $db->prepare("SELECT UID,OID,FID,EID,aktiveEID,data,lastupdate FROM user WHERE ".$OID_q." ORDER BY OID ASC");
 						$db_mitglieder->execute();
 						//ErrorInfo
@@ -307,6 +269,7 @@ include("include/header.html");
 									'UID' => $res_mg['UID'],
 									'OID'   => $res_mg['OID'],
 									'FID'   => $res_mg['FID'],
+									'aktiveEID'   => $res_mg['aktiveEID'],
 									'name'   => $data_user_json->name,
 									'dienstnummer'   => isset($data_user_json->dienstnummer) ? $data_user_json->dienstnummer : "",
 									'typ'   => isset($data_user_json->typ) ? $data_user_json->typ : "",
@@ -370,7 +333,7 @@ include("include/header.html");
 								$loop_index++;
 
 								if ($show_user) { //Nur bei wechselseitiger Freigabe werden User angezeigt
-									in_array($result["dienstnummer"], $activetracker) ? $sendet = " sendet" : $sendet = "";
+									//in_array($result["UID"], $activetracker) ? $sendet = " sendet" : $sendet = "";
 									if (in_array($result["UID"], $trackerNum)) {
 										$ist_sender = "active";
 										$sendet = " sendet";
@@ -381,18 +344,15 @@ include("include/header.html");
 									if ($result["kommentar"] != "") {
 										$unserinfo = "<i class='kommentar material-icons text-info' data-toggle='tooltip' data-placement='top' title='" . $result["kommentar"] . "'>info_outline</i> ";
 									}
-									foreach ($pie as $pie_num) {
-										if ($result["UID"] == $pie_num['UID']) {
-											$p_EID = $pie_num['aktiveEID'];
-											if ($EIDaktuell != $p_EID) {
-												$buttonclass = "btn-outline-danger";
-												$imeinsatz = ' ist noch in einem anderen Einsatz aktiv!<br>Bei Zuweisung wird ' . $result["typ"] . ' ' . $result["name"] . ' dort außer Dienst genommen und hier aktiviert!';
-											} else {
-												$imeinsatz = '';
-												$buttonclass = "btn-outline-secondary";
-											}
-										}
+
+									if ($EIDaktuell != $result["aktiveEID"] && ($result["aktiveEID"] != NULL && $result["aktiveEID"] != "")) {
+										$buttonclass = "btn-outline-danger";
+										$imeinsatz = ' ist noch in einem anderen Einsatz aktiv!<br>Bei Zuweisung wird ' . $result["typ"] . ' ' . $result["name"] . ' dort außer Dienst genommen und hier aktiviert!';
+									} else {
+										$imeinsatz = '';
+										$buttonclass = "btn-outline-secondary";
 									}
+
 									//echo (isset($s[''.$result["UID"].'']) ? $s[''.$result["UID"].''] : '');
 									if (!isset($s['' . $result["UID"] . '']) || $s['' . $result["UID"] . ''] < 3 || $s['' . $result["UID"] . ''] >= 10) {
 										if (!isset($s['' . $result["UID"] . ''])  || ($s['' . $result["UID"] . ''] > 2 && $s['' . $result["UID"] . ''] != 10)) {

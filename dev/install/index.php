@@ -434,13 +434,13 @@ $datapath = "../../../secure/data/";
 			--
 
 			CREATE TABLE `lizenzen` (
-			  `ID` int(11) NOT NULL,
-			  `SID` int(11) NOT NULL,
-			  `OID` varchar(11) NOT NULL,
-			  `Bezeichnung` mediumtext NOT NULL,
-			  `Laufzeit` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-			  `lastupdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+				`ID` int(11) NOT NULL,
+				`SID` int(11) NOT NULL,
+				`OID` varchar(11) NOT NULL,
+				`Bezeichnung` mediumtext NOT NULL,
+				`Laufzeit` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+				`lastupdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+			  ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 			-- --------------------------------------------------------
 
@@ -449,25 +449,25 @@ $datapath = "../../../secure/data/";
 			--
 
 			CREATE TABLE `organisation` (
-			  `ID` int(11) NOT NULL,
-			  `OID` varchar(30) NOT NULL,
-			  `data` varchar(5000) NOT NULL,
-			  `maps` text NOT NULL,
-			  `logo` text NOT NULL,
-			  `token` varchar(8) NOT NULL,
-			  `usersync` int(1) NOT NULL DEFAULT '0',
-			  `orgfreigabe` varchar(500) NOT NULL,
-			  `status` varchar(10000) NOT NULL,
-			  `funktionen` varchar(500) NOT NULL,
-			  `suchef` text NOT NULL,
-			  `suchem` text NOT NULL,
-			  `suchep` text NOT NULL,
-			  `suchew` text NOT NULL,
-			  `appsettings` text NOT NULL,
-			  `einheiten` text NOT NULL,
-			  `aktiv` int(11) NOT NULL,
-			  `lastupdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+				`ID` int(11) NOT NULL,
+				`OID` varchar(30) NOT NULL,
+				`data` varchar(5000) NOT NULL,
+				`maps` text NOT NULL,
+				`logo` text NOT NULL,
+				`token` varchar(8) NOT NULL,
+				`usersync` int(1) NOT NULL DEFAULT '0',
+				`orgfreigabe` varchar(500) NOT NULL,
+				`status` varchar(10000) NOT NULL,
+				`funktionen` varchar(500) NOT NULL,
+				`suchef` text NOT NULL,
+				`suchem` text NOT NULL,
+				`suchep` text NOT NULL,
+				`suchew` text NOT NULL,
+				`appsettings` text NOT NULL,
+				`einheiten` text NOT NULL,
+				`aktiv` int(11) NOT NULL,
+				`lastupdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+			  ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 			-- --------------------------------------------------------
 
@@ -476,14 +476,14 @@ $datapath = "../../../secure/data/";
 			--
 
 			CREATE TABLE `ressourcen` (
-			  `ID` int(11),
-			  `RID` varchar(100),
-			  `OID` varchar(30),
-			  `data` mediumtext,
-			  `typ` varchar(10),
-			  `aktiveEID` varchar(10),
-			  `lastupdate` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+				`ID` int(11) NOT NULL,
+				`RID` varchar(100) DEFAULT NULL,
+				`OID` varchar(30) DEFAULT NULL,
+				`data` mediumtext,
+				`typ` varchar(10) DEFAULT NULL,
+				`aktiveEID` varchar(10) DEFAULT NULL,
+				`lastupdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+			  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 			-- --------------------------------------------------------
 
@@ -492,22 +492,22 @@ $datapath = "../../../secure/data/";
 			--
 
 			CREATE TABLE `settings` (
-			  `EID` int(11) NOT NULL,
-			  `data` mediumtext NOT NULL,
-			  `pois` mediumtext NOT NULL,
-			  `gruppen` mediumtext NOT NULL,
-			  `gesucht` mediumtext NOT NULL,
-			  `suchgebiete` mediumtext NOT NULL,
-			  `einteilung` mediumtext NOT NULL,
-			  `personen_im_einsatz` mediumtext NOT NULL,
-			  `protokoll` mediumtext NOT NULL,
-			  `messages` mediumtext NOT NULL,
-			  `checkliste` mediumtext NOT NULL,
-			  `einsatzbericht` longtext NOT NULL,
-			  `orginfo` mediumtext NOT NULL,
-			  `typ` varchar(30) NOT NULL,
-			  `lastupdate` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+				`EID` int(11) NOT NULL,
+				`data` mediumtext NOT NULL,
+				`pois` mediumtext NOT NULL,
+				`gruppen` mediumtext NOT NULL,
+				`gesucht` mediumtext NOT NULL,
+				`suchgebiete` mediumtext NOT NULL,
+				`einteilung` mediumtext NOT NULL,
+				`personen_im_einsatz` mediumtext NOT NULL,
+				`protokoll` mediumtext NOT NULL,
+				`messages` mediumtext NOT NULL,
+				`checkliste` mediumtext NOT NULL,
+				`einsatzbericht` longtext NOT NULL,
+				`orginfo` mediumtext NOT NULL,
+				`typ` varchar(30) NOT NULL,
+				`lastupdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+			  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 			-- --------------------------------------------------------
 
@@ -516,12 +516,16 @@ $datapath = "../../../secure/data/";
 			--
 
 			CREATE TABLE `status` (
-			  `ID` int(11) NOT NULL,
-			  `EID` int(11) NOT NULL,
-			  `OID` varchar(100) NOT NULL,
-			  `UID` varchar(100) NOT NULL,
-			  `status` int(11) NOT NULL,
-			  `lastupdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+				`ID` int(11) NOT NULL,
+				`EID` int(11) NOT NULL,
+				`OID` varchar(100) NOT NULL,
+				`UID` varchar(100) NOT NULL,
+				`lat` varchar(30) NOT NULL,
+				`lon` varchar(30) NOT NULL,
+				`status` int(11) NOT NULL,
+				`token` varchar(100) NOT NULL,
+				`nummer` varchar(30) NOT NULL,
+				`lastupdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 			-- --------------------------------------------------------
@@ -531,14 +535,14 @@ $datapath = "../../../secure/data/";
 			--
 
 			CREATE TABLE `suchprofile` (
-			  `ID` int(11) NOT NULL,
-			  `cid` varchar(10) NOT NULL,
-			  `suchprofildata` text NOT NULL,
-			  `distanzen` varchar(300) NOT NULL,
-			  `name` varchar(300) NOT NULL,
-			  `beschreibung` text NOT NULL,
-			  `wahrsch` varchar(100) NOT NULL
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+				`ID` int(11) NOT NULL,
+				`cid` varchar(10) NOT NULL,
+				`suchprofildata` text NOT NULL,
+				`distanzen` varchar(300) NOT NULL,
+				`name` varchar(300) NOT NULL,
+				`beschreibung` text NOT NULL,
+				`wahrsch` varchar(100) NOT NULL
+			  ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 			-- --------------------------------------------------------
 
@@ -547,22 +551,23 @@ $datapath = "../../../secure/data/";
 			--
 
 			CREATE TABLE `tracking` (
-			  `ID` int(11) NOT NULL,
-			  `EID` varchar(100) NOT NULL,
-			  `OID` varchar(50) NOT NULL,
-			  `UID` varchar(100) NOT NULL,
-			  `lat` varchar(30) NOT NULL,
-			  `lon` varchar(30) NOT NULL,
-			  `timestamp` varchar(100) NOT NULL,
-			  `hdop` varchar(100) NOT NULL,
-			  `altitude` varchar(100) NOT NULL,
-			  `speed` varchar(100) NOT NULL,
-			  `oidmitglied` varchar(50) NOT NULL,
-			  `nummer` varchar(100) NOT NULL,
-			  `timestamp_server` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-			  `herkunft` varchar(30) NOT NULL,
-			  `gruppe` varchar(30) NOT NULL
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+				`ID` int(11) NOT NULL,
+				`EID` varchar(100) NOT NULL,
+				`OID` varchar(50) NOT NULL,
+				`UID` varchar(100) NOT NULL,
+				`lat` varchar(30) NOT NULL,
+				`lon` varchar(30) NOT NULL,
+				`timestamp` varchar(100) NOT NULL,
+				`hdop` varchar(100) NOT NULL,
+				`altitude` varchar(100) NOT NULL,
+				`speed` varchar(100) NOT NULL,
+				`oidmitglied` varchar(50) NOT NULL,
+				`nummer` varchar(100) NOT NULL,
+				`timestamp_server` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+				`herkunft` varchar(30) NOT NULL,
+				`gruppe` varchar(30) NOT NULL,
+				`token` varchar(100) NOT NULL
+			  ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 			-- --------------------------------------------------------
 
@@ -571,20 +576,20 @@ $datapath = "../../../secure/data/";
 			--
 
 			CREATE TABLE `user` (
-			  `ID` int(11) NOT NULL,
-			  `UID` varchar(100) NOT NULL,
-			  `OID` varchar(30) NOT NULL,
-			  `FID` varchar(11) NOT NULL DEFAULT '10',
-			  `EID` varchar(100) NOT NULL DEFAULT '-1',
-			  `username` varchar(100) NOT NULL,
-			  `data` mediumtext NOT NULL,
-			  `aktiveEID` varchar(10) NOT NULL,
-			  `pwd` varchar(300) NOT NULL,
-			  `pwdresetkey` varchar(60) NOT NULL,
-			  `token` char(64),
-			  `token_expiration_date` timestamp,
-			  `lastupdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+				`ID` int(11) NOT NULL,
+				`UID` varchar(100) NOT NULL,
+				`OID` varchar(30) NOT NULL,
+				`FID` varchar(11) NOT NULL DEFAULT '10',
+				`EID` varchar(100) NOT NULL DEFAULT '-1',
+				`username` varchar(100) NOT NULL,
+				`data` mediumtext NOT NULL,
+				`aktiveEID` varchar(10) NOT NULL,
+				`pwd` varchar(300) NOT NULL,
+				`pwdresetkey` varchar(60) NOT NULL,
+				`token` char(64) DEFAULT NULL,
+				`token_expiration_date` timestamp NULL DEFAULT NULL,
+				`lastupdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+			  ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 			-- --------------------------------------------------------
 
@@ -593,11 +598,11 @@ $datapath = "../../../secure/data/";
 			--
 
 			CREATE TABLE `workstations` (
-			  `ID` int(11) NOT NULL,
-			  `SID` int(11) NOT NULL,
-			  `bezeichnung` mediumtext NOT NULL,
-			  `lastupdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+				`ID` int(11) NOT NULL,
+				`SID` int(11) NOT NULL,
+				`bezeichnung` mediumtext NOT NULL,
+				`lastupdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+			  ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 			--
 			-- Indizes der exportierten Tabellen
@@ -828,7 +833,7 @@ $datapath = "../../../secure/data/";
 			$username_sha256 = hash("sha256","DEV-".$username,false);
 			
 			//PWD auf md5 mit Salt
-			for ($s = '', $j = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')-1; $j != 32; $x = rand(0,$z), $s .= $a{$x}, $j++); 
+			$s = random_bytes(32);
 			$str = $syspwd.$s;
 			$strmd5 = md5($str);
 			$newpassword = $strmd5.':'.$s;
@@ -911,7 +916,7 @@ $datapath = "../../../secure/data/";
 		
 			
 			//PWD auf md5 mit Salt
-			for ($s = '', $j = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')-1; $j != 32; $x = rand(0,$z), $s .= $a{$x}, $j++); 
+			$s = random_bytes(32); 
 			$str = $syspwd.$s;
 			$strmd5 = md5($str);
 			$newpassword = $strmd5.':'.$s;
@@ -950,13 +955,13 @@ $datapath = "../../../secure/data/";
 			$pwdx = generate_string($permitted_chars, 12);
 			
 			//Username md5
-			for ($s = '', $j = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')-1; $j != 32; $x = rand(0,$z), $s .= $a{$x}, $j++); 
+			$s = random_bytes(32); 
 			$str = $randusername.$s;
 			$strmd5 = md5($str);
 			$randusername_md5 = $strmd5.':'.$s;
 			
 			//PWD auf md5 mit Salt
-			for ($s = '', $j = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')-1; $j != 32; $x = rand(0,$z), $s .= $a{$x}, $j++); 
+			$s = random_bytes(32);
 			$str = $pwdx.$s;
 			$strmd5 = md5($str);
 			$newpassword = $strmd5.':'.$s;

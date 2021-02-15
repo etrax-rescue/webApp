@@ -40,7 +40,7 @@ require $baseURL . "include/sessionhandler.php"; //Der Sessionhandler schreibt d
 if ($USER["lesen"]) { //Mindestens Leserechte werden benötigt um etwas angezeigt zu bekommen.
 	$alarmiertname = $alarmierttelefon = $alarmiertdatum = $alarmiertzeit = $alarmiertvermisst = $gesuchtbild = $gesuchtname = $gesuchtadresse = $gesuchtalter = $gesuchttelefon = $gesuchtbeschreibung = $kontaktname = $kontaktadresse = $kontakttelefon = $gesuchtsvnr = $gesuchterkrankungen = $gesuchtbeschreibungextern = $gesuchtbeschreibungintern = "";
 	$sql_suchtyp = $db->prepare("SELECT gesucht FROM settings WHERE EID = " . $EID . "");
-	$sql_suchtyp->execute($sql_suchtyp->errorInfo());
+	$sql_suchtyp->execute() or die(print_r($sql_suchtyp->errorInfo(), true));
 	while ($sqlsuchtyp = $sql_suchtyp->fetch(PDO::FETCH_ASSOC)) {
 		($sqlsuchtyp['gesucht'] != null) ? $gesucht_json = json_decode(substr(string_decrypt($sqlsuchtyp['gesucht']), 1, -1)) : $gesucht_json = [];
 	}
@@ -54,7 +54,7 @@ if ($USER["lesen"]) { //Mindestens Leserechte werden benötigt um etwas angezeig
 	echo "<script>";
 
 	$searchtyp = $db->prepare("SELECT id,cid,distanzen,name,beschreibung FROM suchprofile");
-	$searchtyp->execute($searchtyp->errorInfo());
+	$searchtyp->execute() or die(print_r($searchtyp->errorInfo(), true));
 	while ($rowsuchtyp = $searchtyp->fetch(PDO::FETCH_ASSOC)) {
 		if ($rowsuchtyp['cid'] == $suchtyp) {
 			$suchtypname = "" . $rowsuchtyp['name'] . "";

@@ -2,7 +2,7 @@
 <?php 
 //if($userlevel > 0){$oidselect = "WHERE OID = '".$OID."'";} else {$OID = "";}
 $db_organisation = $db->prepare("SELECT OID, data FROM organisation ".$oidselect);
-$db_organisation->execute($db_organisation->errorInfo());
+$db_organisation->execute() or die(print_r($db_org->errorInfo(), true));
 
 while ($result = $db_organisation->fetch(PDO::FETCH_ASSOC)){
 	$data_org_json = json_decode(substr(string_decrypt($result['data']), 1, -1));
@@ -43,7 +43,7 @@ while ($result = $db_organisation->fetch(PDO::FETCH_ASSOC)){
 						//Button User zu Administrator machen
 						//User aus der DB holen
 						$db_mitglieder = $db->prepare("SELECT * FROM user WHERE OID = '".$oid_temp."'");
-						$db_mitglieder->execute($db_mitglieder->errorInfo());
+						$db_mitglieder->execute() or die(print_r($db_mitglieder->errorInfo(), true));
 						$user_arr = array();
 						//print_r($db_mitglieder);
 						$n_user = 0;
@@ -97,7 +97,7 @@ while ($result = $db_organisation->fetch(PDO::FETCH_ASSOC)){
 <?php  		// User Anzeigen
 			//Array mit Einsätzen aufbauen
 			$db_settings = $db->prepare("SELECT EID, data FROM settings ORDER BY EID");
-			$db_settings->execute($db_settings->errorInfo());
+			$db_settings->execute() or die(print_r($db_settings->errorInfo(), true));
 			$einsatz_arr = array();
 			//print_r($db_mitglieder);
 			while ($res_einsatz = $db_settings->fetch(PDO::FETCH_ASSOC)){
@@ -109,7 +109,7 @@ while ($result = $db_organisation->fetch(PDO::FETCH_ASSOC)){
 			
 			//User aus der DB holen
 			$db_admin = $db->prepare("SELECT * FROM user WHERE OID = '".$oid_temp."' AND FID < 10 AND EID != '-1' ORDER BY UID AND eid");
-			$db_admin->execute($db_admin->errorInfo());
+			$db_admin->execute() or die(print_r($db_admin->errorInfo(), true));
 			$admin_arr = array();
 			//print_r($db_mitglieder);
 			$n_user = 0;

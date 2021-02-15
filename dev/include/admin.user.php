@@ -2,7 +2,7 @@
 <?php 
 //if($userlevel > 0){$oidselect = "WHERE OID = '".$OID."'";} else {$OID = "";}
 $db_organisation = $db->prepare("SELECT OID, data, usersync, funktionen FROM organisation ".$oidselect);
-$db_organisation->execute($db_organisation->errorInfo());
+$db_organisation->execute() or die(print_r($db_organisation->errorInfo(), true));
 
 while ($result = $db_organisation->fetch(PDO::FETCH_ASSOC)){
 	$data_org_json = json_decode(substr(string_decrypt($result['data']), 1, -1));
@@ -124,7 +124,7 @@ while ($result = $db_organisation->fetch(PDO::FETCH_ASSOC)){
 <?php  		// User Anzeigen
 			//User aus der DB holen
 			$db_mitglieder = $db->prepare("SELECT * FROM user WHERE OID = '".$oid_temp."'");
-			$db_mitglieder->execute($db_mitglieder->errorInfo());
+			$db_mitglieder->execute() or die(print_r($db_mitglieder->errorInfo(), true));
 			$user_arr = array();
 			//print_r($db_mitglieder);
 			$n_user = 0;

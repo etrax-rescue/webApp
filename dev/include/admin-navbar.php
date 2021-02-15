@@ -11,7 +11,7 @@
 				<div  class="list-group-item"><strong>Organisation wählen:</strong></div>
 				<?php
 					$db_organisation = $db->prepare("SELECT * FROM organisation");
-					$db_organisation->execute($db_organisation->errorInfo());
+					$db_organisation->execute() or die(print_r($db_organisation->errorInfo(), true));
 					$oidtemp = "";
 					while ($result = $db_organisation->fetch(PDO::FETCH_ASSOC)){
 						$oidtemp = $result['OID'];
