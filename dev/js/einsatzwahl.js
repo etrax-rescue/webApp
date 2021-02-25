@@ -160,7 +160,7 @@ $(function() {
 		});	
 		
 		let Einsatz_anlegen = function(that){
-			let e_typ,text,lon,lat,starttime,neueEID,eOID;
+			let e_typ,text,lon,lat,starttime,neueEID,eOID,aOID,bOID;
 			if($("#einsatzname").val() != ""){
 				e_typ = $(".e_typ input:checked").val();
 				text = $("#einsatzname").val();
@@ -168,6 +168,16 @@ $(function() {
 				lat = ($("#einsatzlat").val() != '') ? $("#einsatzlat").val() : lat_default;
 				starttime = ($('#einsatzstart').val() != '') ? $('#einsatzstart').val() : window.time;
 				eOID = $('#primorg  option:selected').val();
+				aOID = $( "#beteiligteORG input.admin:checked" ).map(function() {
+										return this.id;
+										})
+										.get()
+										.join();
+				bOID = $( "#beteiligteORG input.user:checked" ).map(function() {
+										return this.id;
+										})
+										.get()
+										.join();
 				var error = "";
 				$(".modal.einsatzneu").modal('hide');
 				sessionStorage.setItem("centerX",lat);
@@ -177,12 +187,14 @@ $(function() {
 				// checking if Google found location
 				
 				// direct changes in db ( fieldname: value)
+				let Ogleich = (aOID != '') ? eOID+','+aOID : eOID;
+				let Osehen = (bOID != '') ? Ogleich+','+bOID : Ogleich;
 				let einsatz_vars = {
 					'OID': eOID,
-					'Ogleich': OID,
-					'Ozeichnen': OID,
-					'Ozuweisen': OID,
-					'Osehen': OID,
+					'Ogleich': Ogleich,
+					'Ozeichnen': Ogleich,
+					'Ozuweisen': Ogleich,
+					'Osehen':Osehen,
 					'einsatz': text,
 					'anfang': starttime,
 					'ende': '',
@@ -323,7 +335,7 @@ $(function() {
 				function() 
 				{
 					location.reload();
-				}, 1000);
+				}, 1500);
 		}
 		
 		

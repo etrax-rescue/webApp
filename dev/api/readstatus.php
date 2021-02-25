@@ -17,7 +17,7 @@ $hiddentracks = isset($_SESSION["etrax"]["hiddentracks"]) ? $_SESSION["etrax"]["
 
 $token = $ORG_status = $OIDs = [];
 $org_query= $db->prepare("SELECT OID,token,status FROM organisation");
-$org_query->execute($org_query->errorInfo());
+$org_query->execute() or die(print_r($org_query->errorInfo(), true));
 while ($org_data = $org_query->fetch(PDO::FETCH_ASSOC)){
 	$token[$org_data['OID']] = $org_data['token'];
 	$OIDs[$org_data['token']] = $org_data['OID'];
@@ -32,7 +32,7 @@ while ($org_data = $org_query->fetch(PDO::FETCH_ASSOC)){
 $status = $UserimEinsatz = $userdata = $User = $gruppenID = $protokoll = $gruppenimEinsatz = [];
 $valid_status = false;
 $sql_query = $db->prepare("SELECT data,personen_im_einsatz,gruppen,protokoll FROM settings WHERE EID =".$EID);
-$sql_query->execute($sql_query->errorInfo());
+$sql_query->execute() or die(print_r($sql_query->errorInfo(), true));
 while ($sql_json = $sql_query->fetch(PDO::FETCH_ASSOC)){
 	if($sql_json['gruppen'] != null){
 		$gruppenjson = string_decrypt($sql_json['gruppen']);
@@ -69,7 +69,7 @@ $userjson = '';
 $user_dnr = $user_bos = $members = $member = [];
 //$OIE = str_replace($OIDs_im_Einsatz,",","','");
 $user_query= $db->prepare("SELECT UID,OID,data FROM user");//  WHERE OID IN ('".$OIE."')
-$user_query->execute($user_query->errorInfo());
+$user_query->execute() or die(print_r($user_query->errorInfo(), true));
 while ($user_data = $user_query->fetch(PDO::FETCH_ASSOC)){
 	if($user_data['data'] != null){
 		$datajson = string_decrypt($user_data['data']);
@@ -100,7 +100,7 @@ while($rowstatus = $userstatus->fetch(PDO::FETCH_ASSOC)){
 	// Versuchen die letzt Position für die App holen
 	if($lon == "" || $lat == ""){
 		$coords_query= $db->prepare("SELECT lat,lon FROM tracking WHERE herkunft = 'APP' AND EID = '".$EID."' AND token = '".$rowstatus['token']."' AND nummer = '".$rowstatus['nummer']."' order by timestamp desc LIMIT 1");
-		$coords_query->execute($coords_query->errorInfo());
+		$coords_query->execute() or die(print_r($coords_query->errorInfo(), true));
 		while ($coords_data = $coords_query->fetch(PDO::FETCH_ASSOC)){
 			$lat = $coords_data['lat'];
 			$lon = $coords_data['lon'];
@@ -224,9 +224,15 @@ while($rowstatus = $userstatus->fetch(PDO::FETCH_ASSOC)){
 					$status_nodes = array("aktuellerStatus" => $text_status, "zeit" => date("Y-m-d H:i:s"), "status" => $status_history);
 					$vars = array('table'=>'settings','action'=>'update','type'=>'json_update','column'=>'gruppen','select'=>$EID,'values'=>$gruppe,'json_nodes'=>$status_nodes);
 					ob_start();
-						read_write_db($vars);
+					read_write_db($vars);
+					ob_end_clean();
+					$searcharea_nodes = array('status'=>$text_status);
+					$searcharea_vars = array('table'=>'settings','action'=>'update','type'=>'json_replace','column'=>'suchgebiete','select'=>$EID,'values'=>'e_group-'.$gruppenID[$gruppe]["id"], 'json_nodes'=>$searcharea_nodes);
+					ob_start();
+					read_write_db($searcharea_vars);
 					ob_end_clean();
 				}
+				
 			}elseif(in_array($status, $message_status)) {//Benachrichtigungen mit "Pushnofitification" für als Overlay des Kartenfensters
 				$text_read = false;
 			}

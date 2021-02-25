@@ -135,7 +135,7 @@ include("include/header.html");
 					<h4 class="btn btn-secondary w-100">User und Material</h4>
 					<input class="btn btn-outline-primary bg-white color-black sorterinput listfilter mr-2 col-8" placeholder="filtern nach Name, DNR, BOS" data-target="#memberlist #members ul li" id="usersort" type="text"><i title="Liste neu laden" class="sync material-icons">backspace</i>
 					<div class="clearfix"></div>
-					<ul id="members" class="list-group">
+					<ul id="members" class="list-group list-unstyled">
 
 						<?php
 						if ($trackstart != 0) {
@@ -183,7 +183,7 @@ include("include/header.html");
 						$gone = [];
 						// User im Einsatz und Pause holen
 						$HFcount = $IEcount = 0;
-						$User_in_Pause = $User_im_Einsatz = $Material_im_Einsatz = $User_im_Einsatz_UID = [];
+						$User_in_Pause = $User_im_Einsatz = $Material_im_Einsatz = $User_im_Einsatz_UID = $im_Einsatz = [];
 						if (is_array($UserimEinsatz) || is_object($UserimEinsatz)) {
 							foreach ($UserimEinsatz as $member) {
 								foreach ($member['data'] as $memberdata) {
@@ -229,10 +229,22 @@ include("include/header.html");
 										if ($m_status >= 3 && $m_status != 10 && $m_status != 11) {
 											$bos = ($m_bos) ? "<br>BOS: " . $m_bos : '';
 											$phone = ($m_phone) ? "<br>TEL: " . $m_phone : '';
-											$tooltip_text = $oidname[$m_OID]['kurzname'] . "<br>" . $m_typ . " " . $m_dienstnummer . " " . $sendet_txt . $bos . $phone;
+											$tooltip_text = ($m_typ != "Material") ? $oidname[$m_OID]['kurzname'] . "<br>" . $m_typ . " " . $m_dienstnummer . " " . $sendet_txt . $bos . $phone : '';
 											$m_typ == "HF" ? $HFcount += 1 : '';
 											$IEcount += 1;
-											$ist_im_Einsatz = "<li data-toggle='tooltip' data-html='true' data-placement='right' title='" . $tooltip_text . "' class='btn " . $buttontype . " list-group-item mt-2 w-100 d-flex' data-uid='" . $m_UID . "' data-oid='" . $org . "' data-typ='" . $m_typ . "' data-dienstnummer='" . $m_dienstnummer . "' data-ausbildungen='" . $ausbildungen . "' data-name='" . $m_name . "' data-bos='" . $m_bos . "' data-phone='" . $m_phone . "' data-pause='" . $m_pause . "' data-sendet='" . $ist_sender . "' data-oldEID='" . $EID . "' data-externorganisation='" . $EID . "'" . $sendet_txt . ">" . $arrowleft . "<span class='user'><span class='sr-only'>" . $oidname[$m_OID]['kurzname'] . " " . $m_dienstnummer . " " . $m_bos . "</span>" . $m_name . "<span class='badge badge-info ml-1'>" . $m_typ . "</span></span><span class='d-inline-block typ ml-2'>" . $tracker_icon . "</span>" . $arrowright . "</li>\n";
+											if($m_typ != "Material"){
+												$ist_im_Einsatz = "
+												<li data-toggle='tooltip' data-html='true' data-placement='right' title='" . $tooltip_text . "' class='btn " . $buttontype . " list-group-item mt-2 w-100 d-flex' data-uid='" . $m_UID . "' data-oid='" . $org . "' data-typ='" . $m_typ . "' data-dienstnummer='" . $m_dienstnummer . "' data-ausbildungen='" . $ausbildungen . "' data-name='" . $m_name . "' data-bos='" . $m_bos . "' data-phone='" . $m_phone . "' data-pause='" . $m_pause . "' data-sendet='" . $ist_sender . "' data-oldEID='" . $EID . "' data-externorganisation='" . $EID . "'" . $sendet_txt . ">
+													" . $arrowleft . "<span class='user'><span class='sr-only'>" . $oidname[$m_OID]['kurzname'] . " " . $m_dienstnummer . " " . $m_bos . "</span>" . $m_name . "<span class='badge badge-info ml-1'>" . $m_typ . "</span></span><span class='d-inline-block typ ml-2'>" . $tracker_icon . "</span>" . $arrowright . 
+												"</li>\n";
+												$im_Einsatz[$m_OID][] = $ist_im_Einsatz;
+											}else{
+												$ist_im_Einsatz = "
+													<li data-toggle='tooltip' data-html='true' data-placement='right' title='" . $tooltip_text . "' class='btn " . $buttontype . " list-group-item mt-2 w-100 d-flex' data-uid='" . $m_UID . "' data-oid='" . $org . "' data-typ='" . $m_typ . "' data-dienstnummer='" . $m_dienstnummer . "' data-ausbildungen='" . $ausbildungen . "' data-name='" . $m_name . "' data-bos='" . $m_bos . "' data-phone='" . $m_phone . "' data-pause='" . $m_pause . "' data-sendet='" . $ist_sender . "' data-oldEID='" . $EID . "' data-externorganisation='" . $EID . "'" . $sendet_txt . ">
+														" . $arrowleft . "<span class='user'><span class='sr-only'>Material " . $m_dienstnummer . "</span>" . $m_name . "<span class='badge badge-info ml-1'>" . $m_typ . "</span></span><span class='d-inline-block typ ml-2'>" . $tracker_icon . "</span>" . $arrowright . 
+													"</li>\n";
+												$im_Einsatz['material'][] = $ist_im_Einsatz;
+											}
 											array_push($User_im_Einsatz, $ist_im_Einsatz);
 										}
 									} elseif ($m_status == 9) {
@@ -325,9 +337,14 @@ include("include/header.html");
 									$show = ($result['OID'] == $myOID) ? 'show' : '';
 									$expande = ($result['OID'] == $myOID) ? 'true' : 'false';
 									echo "
-									<li class='btn btn-link font-weight-bold color-white bg-red mt-3' data-toggle='collapse' data-target='#collapse" . $oid_loop . "' aria-expanded=" . $expande . " aria-controls='collapse" . $oid_loop . "'>" . $oidname[$result['OID']]['kurzname'] . "</li><ul id='collapse" . $oid_loop . "' class='pl-0 collapse " . $show . "' aria-labelledby='headingOne" . $oid_loop . "'>";
+									<li class='btn btn-link font-weight-bold color-white bg-red mt-3' data-toggle='collapse' data-target='#collapse" . $oid_loop . "' aria-expanded=" . $expande . " aria-controls='collapse" . $oid_loop . "'>" . $oidname[$result['OID']]['kurzname'] . "</li><li id='collapse" . $oid_loop . "' class='pl-0 collapse " . $show . "' aria-labelledby='headingOne" . $oid_loop . "'>
+										<ul class='list-group list-unstyled'>";
 									if (!$show_user) {
-										echo $other_org ? "<li class='font-weight-bold color-red mt-3 p-1'>Ihre Rechte erlauben keine Anzeige Mitglieder anderer Organisationen</li>" : "<li class='font-weight-bold color-red mt-3 p-1'>Diese Organisation hat keine Freigabe für die Zusammenarbeit erteilt</li>";
+										echo $other_org ? "
+											<li class='font-weight-bold color-red mt-3 p-1'>
+												Ihre Rechte erlauben keine Anzeige Mitglieder anderer Organisationen</li>" : "<li class='font-weight-bold color-red mt-3 p-1'>Diese Organisation hat keine Freigabe für die Zusammenarbeit erteilt
+											</li>
+										</ul>";
 									}
 								}
 								$loop_index++;
@@ -365,18 +382,25 @@ include("include/header.html");
 											$statusicon = '<i class="material-icons text-info" data-toggle="tooltip" data-placement="top" title="" data-original-title="Am Heimweg">directions_car</i>';
 										}
 										$m_status = (isset($s[''.$result["UID"].'']) ? $s[''.$result["UID"].''] : '');
-										echo "<li  data-toggle='tooltip' data-placement='right' title='" . $result['typ'] . " " . $result['dienstnummer'] . $imeinsatz . " <br> ' data-html='true' class='btn " . $buttonclass . " list-group-item w-100 mt-2 mitglied d-flex" . $imeinsatzclass . "' data-dienstnummer='" . $result["dienstnummer"] . "' data-uid='" . $result["UID"] . "' data-oid='" . $result["OID"] . "' data-orgname= '" . $oidname[$result['OID']]['kurzname'] . "' data-typ='" . $result["typ"] . "'  data-name='" . $result["name"] . "' data-ausbildungen='" . $result["ausbildungen"] . "' data-bos='" . $result["bos"] . "' data-phone='" . $result["telefon"] . "' data-email='" . $result["email"] . "' data-pause='" . $result["pause"] . "'  data-sendet='" . $ist_sender . "'  data-oldEID='" . $p_EID . "'><i title='Mitglied editieren' class='edituser material-icons'>mode_edit</i><span class='d-inline-block user'><span class='sr-only'>" . $result["dienstnummer"] . " " . $result["bos"] . "</span>" . $result["name"] . "<span class='badge badge-info typ ml-1 mr-1'>" . $result["typ"] . "</span>" . $statusicon . $unserinfo . "</span><span class='d-inline-block ml-1'>" . $tracker_icon . "</span>";
-										//Mehr als Leserechte erforderlich um in Einsatz nehmen zu können
-										echo $_SESSION["etrax"]["USER"]["zuweisen"] ? "<i class='moveright material-icons ml-auto'>arrow_forward</i></li>\n" : "</li>\n";
+										echo "
+											<li  data-toggle='tooltip' data-placement='right' title='" . $result['typ'] . " " . $result['dienstnummer'] . $imeinsatz . " <br> ' data-html='true' class='btn " . $buttonclass . " list-group-item w-100 mt-2 mitglied d-flex" . $imeinsatzclass . "' data-dienstnummer='" . $result["dienstnummer"] . "' data-uid='" . $result["UID"] . "' data-oid='" . $result["OID"] . "' data-orgname= '" . $oidname[$result['OID']]['kurzname'] . "' data-typ='" . $result["typ"] . "'  data-name='" . $result["name"] . "' data-ausbildungen='" . $result["ausbildungen"] . "' data-bos='" . $result["bos"] . "' data-phone='" . $result["telefon"] . "' data-email='" . $result["email"] . "' data-pause='" . $result["pause"] . "'  data-sendet='" . $ist_sender . "'  data-oldEID='" . $p_EID . "'>
+												<i title='Mitglied editieren' class='edituser material-icons'>mode_edit</i><span class='d-inline-block user'><span class='sr-only'>" . $result["dienstnummer"] . " " . $result["bos"] . "</span>" . $result["name"] . "
+											<span class='badge badge-info typ ml-1 mr-1'>" . $result["typ"] . "</span>" . $statusicon . $unserinfo . "</span><span class='d-inline-block ml-1'>" . $tracker_icon . "</span>";
+											//Mehr als Leserechte erforderlich um in Einsatz nehmen zu können
+												echo $_SESSION["etrax"]["USER"]["zuweisen"] ? "<i class='moveright material-icons ml-auto'>arrow_forward</i></li>\n" : "
+											</li>\n";
 										
 									}
 								}
 							}
 						}
+						// User & Material-Loop Ende
 						?>
-						</ul>
-						<li class="btn btn-link font-weight-bold color-white bg-red mt-3" data-toggle="collapse" data-target="#collapseMaterial" aria-expanded="true" aria-controls="collapseMaterial">Material <?php echo $oidname[$_SESSION["etrax"]["OID"]]['kurzname']; ?></li>
-						<ul id="collapseMaterial" class="pl-0 collapse" aria-labelledby="headingOneMaterial">
+									</ul>
+								</li>
+								<li class="btn btn-link font-weight-bold color-white bg-red mt-3" data-toggle="collapse" data-target="#collapseMaterial" aria-expanded="true" aria-controls="collapseMaterial">Material <?php echo $oidname[$_SESSION["etrax"]["OID"]]['kurzname']; ?></li>
+								<li id="collapseMaterial" class="pl-0 collapse" aria-labelledby="headingOneMaterial">
+									<ul class="list-group list-unstyled">
 							<?php
 							$sql_ressourcen = $db->prepare("SELECT ID,OID,RID,data,typ,aktiveEID FROM ressourcen WHERE OID = ? ");
 							$sql_ressourcen->bindParam(1, $_SESSION["etrax"]["OID"], PDO::PARAM_STR);
@@ -388,28 +412,93 @@ include("include/header.html");
 								$ressource = json_decode(string_decrypt($sql_json['data']), true);
 								if(!in_array($sql_json['RID'].'-'.$sql_json['OID'], $Material_im_Einsatz)) {
 									if ($ressource[0]['name'] !== ''){
-										echo "<li class='btn  btn-outline-secondary list-group-item w-100 mt-2 mitglied d-flex mitglied material' data-dienstnummer='" . $ressource[0]['kennung'] . "' data-uid='" . $sql_json['RID'] . "-" . $sql_json['OID'] . "' data-oid='".$sql_json['OID']."' data-oldEID='" . $sql_json['aktiveEID'] . "' data-typ='Material' data-name='" . $ressource[0]['typ'] . " " . $ressource[0]['name'] . "' data-ausbildungen='' data-bos='' data-phone='' data-email='' data-pause='' data-sendet=''>";
-										echo '<span class="d-inline-block user">'.$ressource[0]['typ'] . ' ' . $ressource[0]['name'] . ' ' . $ressource[0]['kennung'].' <span class="badge badge-info typ ml-1 mr-1">Material</span></span><span class="d-inline-block ml-1"></span>';
-										echo $_SESSION["etrax"]["USER"]["zuweisen"] ? "<i class='moveright material-icons ml-auto'>arrow_forward</i></li>\n" : "</li>\n";
+										echo "
+										<li class='btn  btn-outline-secondary list-group-item w-100 mt-2 mitglied d-flex mitglied material' data-dienstnummer='" . $ressource[0]['kennung'] . "' data-uid='" . $sql_json['RID'] . "-" . $sql_json['OID'] . "' data-oid='Material' data-oldEID='" . $sql_json['aktiveEID'] . "' data-typ='Material' data-name='" . $ressource[0]['typ'] . " " . $ressource[0]['name'] . "' data-ausbildungen='' data-bos='' data-phone='' data-email='' data-pause='' data-sendet=''>";
+											echo '<span class="d-inline-block user">'.$ressource[0]['typ'] . ' ' . $ressource[0]['name'] . ' ' . $ressource[0]['kennung'].' <span class="badge badge-info typ ml-1 mr-1">Material</span></span><span class="d-inline-block ml-1"></span>';
+											echo $_SESSION["etrax"]["USER"]["zuweisen"] ? "<i class='moveright material-icons ml-auto'>arrow_forward</i>
+										</li>\n" : "</li>\n";
 									}
 								}
 							}
 							?>
-						</ul>
-					</ul>
-				</div>
-			</div>
-			<div id="imEinsatz" class="groupbox col-12 col-lg-4 p-2">
-				<div class="bg-lightgray p-2">
-					<h4 class="btn bg-green color-white w-100">Im Einsatz: <?php echo 'HF = <span class="HFcount">'.$HFcount.'</span>, H = <span class="Hcount">'.($IEcount - $HFcount);?></span></h4>
-					<input class="btn btn-outline-primary bg-white color-black sorterinput listfilter mr-2 col-8" placeholder="filtern nach Name, DNR, BOS" id="einsatzusersort" data-target="#inEinsatz .members li" type="text"><i title="Löschen" class="sync material-icons">backspace</i>
-					<div class="clearfix"></div>
-					<ul class="members list-group w-100">
+									</ul>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div id="imEinsatz" class="groupbox col-12 col-lg-4 p-2">
+						<div class="bg-lightgray p-2">
+							<h4 class="btn bg-green color-white w-100">Im Einsatz: <?php echo 'HF = <span class="HFcount">'.$HFcount.'</span>, H = <span class="Hcount">'.($IEcount - $HFcount);?></span></h4>
+							<input class="btn btn-outline-primary bg-white color-black sorterinput listfilter mr-2 col-8" placeholder="filtern nach Name, DNR, BOS" id="einsatzusersort" data-target="#inEinsatz .members li" type="text"><i title="Löschen" class="sync material-icons">backspace</i>
+							<div class="clearfix"></div>
+							<ul class="members list-group w-100 list-unstyled">
 						<?php
-						foreach ($User_im_Einsatz as $user) {
+						/*foreach ($User_im_Einsatz as $user) {
 							echo $user;
+						}*/
+						$User_count = 1;
+						foreach ($user_arr as $nr => $result) {
+							$unserinfo = $sendet = $p_EID = $imeinsatz = $imeinsatzclass = "";
+							$buttonclass = "btn-outline-secondary";
+							//Prüfen ob Organisation für die Einsatzführende Organisation die Freigabe erteilt hat
+							$jtadmin = json_decode($oidname[$result['OID']]["orgfreigabe"], true); //Organisationsfreigaben der abgerufenen Organisation anzeigen
+							if (array_key_exists($OID, $jtadmin) || $result['OID'] == $OID) {
+								//Anzeige aller organisationen nur, wenn die Berechtigung user auf "Alle Rechte" bzw. Organisation auf gleich gestellt ist
+								if($_SESSION["etrax"]["USER"]["gleich"] || $result['OID'] == $_SESSION["etrax"]["OID"]){
+									$show_user = $other_org = TRUE;
+								} else {
+									$show_user = FALSE;
+									$other_org = TRUE;
+								}
+							} else {
+								$show_user = $other_org = FALSE;
+							}
+							if ($result['OID'] != "DEV") { // User von eTrax Developmentteam werden nicht angezeigt
+								if ($oid_loop != $result["OID"]) {
+									$oid_loop = $result["OID"];
+									$show = ($result['OID'] == $myOID) ? 'show' : '';
+									$expande = ($result['OID'] == $myOID) ? 'true' : 'false';
+									$count_im_Einsatz = isset($im_Einsatz[$result["OID"]]) ? count($im_Einsatz[$result["OID"]]): 0;
+									echo "
+									<li class='btn w-100 btn-link font-weight-bold color-white bg-red mt-3' data-toggle='collapse' data-target='#collapseimEinsatz_" . $oid_loop . "' aria-expanded=" . $expande . " aria-controls='collapse" . $oid_loop . "'>" . $oidname[$result['OID']]['kurzname'] . " 
+										<span class='iE-count'>".$count_im_Einsatz."</span>
+									</li>
+									<li id='collapseimEinsatz_" . $oid_loop . "' class='pl-0 collapse " . $show . "' aria-labelledby='headingOne" . $oid_loop . "'>";
+									if(isset($im_Einsatz[$result["OID"]])){
+										echo "
+										<ul class='list-group list-unstyled'>";
+									if (!$show_user) {
+										echo $other_org ? "<li class='font-weight-bold color-red mt-3 p-1'>Ihre Rechte erlauben keine Anzeige Mitglieder anderer Organisationen</li>" : "<li class='font-weight-bold color-red mt-3 p-1'>Diese Organisation hat keine Freigabe für die Zusammenarbeit erteilt</li></ul></li>";
+									}else{
+										foreach ($im_Einsatz[$result["OID"]] as $user) {
+											echo $user;
+										}
+									}
+									echo "</ul>";
+									}
+									echo "</li>";
+								}
+							}
 						}
 						?>
+									<li class="btn btn-link font-weight-bold color-white bg-red mt-3" data-toggle="collapse" data-target="#collapseimEinsatz_Material" aria-expanded="true" aria-controls="collapseMaterial">Material <?php echo $oidname[$_SESSION["etrax"]["OID"]]['kurzname']; ?>
+										<span class='iE-count'><?php if (isset($im_Einsatz["material"])){echo count($im_Einsatz["material"]);}else{ echo 0;}?></span>
+									</li>
+									<li id="collapseimEinsatz_Material" class="pl-0 collapse">
+									<?php
+										if (isset($im_Einsatz["material"])){
+									?>
+										<ul class="list-group list-unstyled">
+											<?php
+												foreach ($im_Einsatz["material"] as $material) {
+													echo $material;
+												}
+											?>
+										</ul>
+									<?php 
+									}
+								?>
+								</li>
 					</ul>
 				</div>
 			</div>

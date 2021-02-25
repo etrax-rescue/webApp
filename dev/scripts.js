@@ -1282,7 +1282,6 @@ function showmap(){
 		url: root+wp+slsh+rwdb+'?type=json&action=read&table=settings&column=suchgebiete&EID='+eid+'&json_nodes&values',
 		format: new GeoJSON()
 	});
-	console.log(searchareasource);
 	
 	let searcharea = new VectorLayer({
 		declutter: true,
@@ -1296,7 +1295,7 @@ function showmap(){
 	let usertracks = function(feature) {
 		let coordinates = feature.getGeometry().getCoordinates()[0];
 		let len = coordinates.length;
-		if (len > 0) {console.log(len);
+		if (len > 0) {
 			coordinates = coordinates.slice(0,1);
 		}
 		let tstyles;
@@ -1400,10 +1399,14 @@ function showmap(){
 
 	// Zentrieren auf Usertracks
 	let Usertrack_array = [];
+	if(sessionStorage.getItem("alltrackshidden") === null){
+		sessionStorage.setItem("alltrackshidden","");
+	}
 	if(sessionStorage.getItem("hiddentracks") === null){
 		sessionStorage.setItem("hiddentracks","");
 	}
 	let auf_Track_zentrieren = function(feature){
+		let alltrackshidden = sessionStorage.getItem("alltrackshidden");
 		let hiddentracks = sessionStorage.getItem("hiddentracks");
 		let track_nr = feature.get('tracknr');
 		let trackname = feature.get('id');
@@ -1414,8 +1417,14 @@ function showmap(){
 			let checked = (!hiddentracks.includes(track_nr)) ? 'check_box' : 'check_box_outline_blank';
 			let tooltip = (!hiddentracks.includes(track_nr)) ? 'Track ausblenden' : 'Track einblenden';
 			let show = (!hiddentracks.includes(track_nr)) ? 'show' : '';
+			let all_checked = (!alltrackshidden.includes('headerid'+groupID+'_'+userID)) ? 'check_box' : 'check_box_outline_blank';
+			let all_tooltip = (!alltrackshidden.includes('headerid'+groupID+'_'+userID)) ? 'Track ausblenden' : 'Track einblenden';
+			let all_show = (!alltrackshidden.includes('headerid'+groupID+'_'+userID)) ? 'show' : '';
 			Usertrack_array.push(track_nr);
-			jQuery("#tracklist").append("<a href='javascript:;' class='showtooltip hiding "+show+"' data-original-title='"+tooltip+"' data-id='"+track_nr+"' data-gid='"+groupID+"' data-uid='"+userID+"'><i class='material-icons'>"+checked+"</i></a> <a href='javascript:;' class='centertrack showtooltip' data-original-title='auf Track zentrieren' data-id='"+trackname+"' data-tlon='"+feature.get('tracklon')+"' data-tlat='"+feature.get('tracklat')+"'><i class='material-icons zoomin'>zoom_in</i></a>Track "+track_nr+" "+trackname+" von "+trackername+" um "+feature.get('time')+"<br>");
+			if(jQuery("#tracklist .singletrack."+groupID+"."+userID).length == 0){
+				jQuery("#tracklist").append('<button class="btn btn-light w-100 d-flex mt-1" type="button" data-toggle="collapse" data-target="#collapse_'+groupID+'_'+userID+'" aria-expanded="false" aria-controls="collapse_'+groupID+'_'+userID+'"><a href="javascript:;" id="headerid'+groupID+'_'+userID+'" class="flex-shrink-1 showtooltip hiding_all '+all_show+'" data-original-title="'+all_tooltip+'" data-collapsid="#collapse_'+groupID+'_'+userID+'" data-headerid="#headerid_'+groupID+'_'+userID+'"><i class="material-icons">'+all_checked+'</i></a><span class="w-100 text-left">Track '+trackname+' von '+trackername+'</span></button><div class="collapse" id="collapse_'+groupID+'_'+userID+'"></div>');
+			}
+			jQuery("#tracklist #collapse_"+groupID+"_"+userID).append("<div class='singletrack "+groupID+" "+userID+"'><a href='javascript:;' class='showtooltip hiding "+show+"' data-original-title='"+tooltip+"' data-id='"+track_nr+"' data-gid='"+groupID+"' data-uid='"+userID+"'><i class='material-icons'>"+checked+"</i></a> <a href='javascript:;' class='centertrack showtooltip' data-original-title='auf Track zentrieren' data-id='"+trackname+"' data-tlon='"+feature.get('tracklon')+"' data-tlat='"+feature.get('tracklat')+"'><i class='material-icons zoomin'>zoom_in</i></a>Track "+track_nr+" "+trackname+" von "+trackername+" um "+feature.get('time')+"<div>");
 		}
 	}
 		
@@ -1739,7 +1748,9 @@ function showmap(){
 						}
 					}
 					if(XY != 0){
-						(feature.get('status')) ? content += "Gruppenstatus: " + feature.get('status') + "<br>" : "";
+						//let status_text = jQuery('#' + feature.get('gruppe')).attr('data-status');
+						let status_text = feature.get('status');
+						(status_text) ? content += "Gruppenstatus: " + status_text + "<br>" : "";
 						content += "RW: "+toUTM(XY)[0]+" HW: "+toUTM(XY)[1]+"<br>RW: "+toDMG(XY)[0].toFixed(3)+" HW: "+toDMG(XY)[1].toFixed(4)+"<br>";
 						(feature.get('beschreibung')) ? content += feature.get('beschreibung') : "";
 						let unit = (feature.get('typ') == 'Suchgebiet') ? aunit : lunit;
@@ -1769,6 +1780,7 @@ function showmap(){
 	
 	etraxmap.on('click', function(evt) {
 		Popup_anzeigen(evt);
+		Suchgebiete_anzeigen();
 	});
 	
 	etraxmap.on('movestart', function(evt) {
@@ -1799,21 +1811,23 @@ function showmap(){
 		* @return {string} The formatted length.
 		*/
 		let sketch, 
+			drawer,
 			helpTooltipElement, 
 			helpTooltip, 
 			measureTooltipElement, 
-			measureTooltip,
 			draw,
-			listener;
-		let continuePolygonMsg = 'Für die Eckpunkte des Suchgebietes in die Karte klicken';
-		let continueLineMsg = 'Für die Punkte der Wegsuche in die Karte klicken';
-		let pointCoords0 = "",
-		pointCoords1 = "",
-		areaType = "",
-		gruppengroesse = "",
-		size = "",
-		nameType = "";
-		let areaCoords = [];
+			snap,
+			modify,
+			listener,
+			continuePolygonMsg = 'Für die Eckpunkte des Suchgebietes in die Karte klicken',
+			continueLineMsg = 'Für die Punkte der Wegsuche in die Karte klicken',
+			pointCoords0 = "",
+			pointCoords1 = "",
+			areaType = "",
+			gruppengroesse = "",
+			size = "",
+			nameType = "",
+			areaCoords = [];
 		
 
 		let formatLength = function(line) {
@@ -1829,9 +1843,10 @@ function showmap(){
 			return output;
 		};
 		
-		function addInteraction() {	
+
+		let addInteraction_draw = function() {	
 			let type = jQuery("#searchtype").val();
-			etraxmap.removeInteraction(draw);
+			//etraxmap.removeInteraction(draw);
 			var pointerMoveHandler = function(evt) {
 				if (evt.dragging) {
 					return;
@@ -1847,10 +1862,6 @@ function showmap(){
 						helpMsg = continueLineMsg;
 					}
 				}
-
-				//helpTooltipElement.innerHTML = helpMsg;
-				//helpTooltip.setPosition(evt.coordinate);
-				//helpTooltipElement.classList.remove('hidden');
 			};
 			etraxmap.on('pointermove', pointerMoveHandler);		
 				
@@ -1885,23 +1896,26 @@ function showmap(){
 				})
 			});
 			etraxmap.addInteraction(draw);
+			snap = new Snap({source: source});
+			etraxmap.addInteraction(snap);
+			modify = new Modify({source: source});
+			etraxmap.addInteraction(modify);
 
-			Suchgebiet_zeichnen();
+			//Suchgebiet_zeichnen();
 			//createHelpTooltip();
 			
 			
+			areaCoords = [];
 			draw.on('drawstart',
 			function(evt) {
-				// set sketch
 				sketch = evt.feature;
-
+				drawer = evt.target;
 				/** @type {module:ol/coordinate~Coordinate|undefined} */
 				var tooltipCoord = evt.coordinate;
 				listener = sketch.getGeometry().on('change', function(evt) {
 					var geom = evt.target, output, neededHF;
 					if (geom instanceof Polygon) {
 						areaType = "Polygon";
-						//nameType = "Suchgebiet";
 						output = runden(formatArea(geom),aunit,afactor);
 						size = formatArea(geom);
 						gruppengroesse = "2HF 2H 1GK";
@@ -1913,12 +1927,12 @@ function showmap(){
 								gruppengroesse = "2HF 2H 1GK";
 							}
 						}
-						//output = output+"<br>"+gruppengroesse;
+						output = ', Größe: ' + output;
 						tooltipCoord = geom.getInteriorPoint().getCoordinates();
 					} else if (geom instanceof LineString) {
 						areaType = "MultiLineString";
-						//nameType = "Wegsuche";
 						output = runden(formatLength(geom),lunit,lfactor);
+						output = ', Länge: ' + output;
 						size = formatLength(geom);
 						gruppengroesse = "2HF 1H 1GK";
 						if(parseFloat(output)/1000 > 5){
@@ -1929,7 +1943,6 @@ function showmap(){
 								gruppengroesse = "2HF 2H 1GK";
 							}
 						}
-						//output = output+" "+gruppengroesse;
 						tooltipCoord = geom.getLastCoordinate();
 						if(jQuery("#searchtype").val() == "areaoverview"){
 							output = "Ecke unten rechts wählen";
@@ -1938,30 +1951,11 @@ function showmap(){
 							output = "Kartenausschnitt wählen";
 						}
 					} 
-					measureTooltipElement.innerHTML = output;
-					measureTooltip.setPosition(tooltipCoord);
+					jQuery('#savegebiete #searchAreas .size').html(output);
 				});
-				
-				areaCoords = [];
-				etraxmap.on('click', function(event) {
-					if(jQuery("body").hasClass("drawArea")){
-						let XY = setnewProjection("EPSG:3857","WGS84",event.coordinate);
-						areaCoords.push(XY);
-					}
-				});
-			}, this);
-
-			draw.on('drawend',
-			function() {
-				//jQuery("#area").html(measureTooltipElement.innerHTML);
-				jQuery("#suchgebiete").modal("show");
-				measureTooltipElement.className = 'tooltip tooltip-static';
-				measureTooltip.setOffset([-15, -15]);
-				sketch = null;
-				measureTooltipElement = null;
-				unByKey(listener);
 			}, this);
 		}
+
 		
 		let Suchgebiet_speichern = function(){
 				draw = false;
@@ -2002,7 +1996,7 @@ function showmap(){
 					}
 				};
 				jQuery(".modal.searchAreas").modal('hide');
-				jQuery(".save-area,.stop-measure,#area").hide();
+				jQuery("#area").hide();
 				jQuery(".start-measure").show();
 				jQuery("#area").html("");
 				jQuery(".tooltip").hide();
@@ -2014,40 +2008,35 @@ function showmap(){
 				database_call('settings','update','json_append','suchgebiete',{EID: eid},Typname,json_data,Suchgebiete_anzeigen,false);
 			}
 				
-			jQuery('#suchgebiete').on('click','.save-area',function(){
+			jQuery('#savegebiete').on('click','.save-area',function(){
+				let XY = sketch.getGeometry().getCoordinates();
+				if(jQuery(this).attr('data-type') == 'point'){
+					areaCoords.push(setnewProjection("EPSG:3857","WGS84",XY));
+				}else{
+					let coordsArray = (jQuery(this).attr('data-type') == 'area') ? XY[0] : XY;
+					coordsArray.forEach(function(item){
+						areaCoords.push(setnewProjection("EPSG:3857","WGS84",item));
+					});
+				}
 				etraxmap.removeInteraction(draw);
+				etraxmap.removeInteraction(snap);
+				etraxmap.removeInteraction(modify);
 				Suchgebiet_speichern();
 			});
 			
-			jQuery('#suchgebiete').on('click','stop-measure',function(){
+			jQuery('#savegebiete').on('click','.stop-measure',function(){
 				etraxmap.removeInteraction(draw);
+				etraxmap.removeInteraction(snap);
+				etraxmap.removeInteraction(modify);
 				jQuery("body").removeClass("drawArea");
-				jQuery(".save-area,.stop-measure,#area").hide();
+				jQuery("#area").hide();
 				jQuery("#area").html("");
-				jQuery(".tooltip").hide();
+				//draw.clear();
 				areaCoords = "";
 				areaType = "";
 				size = "";
 				gruppengroesse = "";
 			});
-
-		/**
-		* Creates a new measure tooltip
-		*/
-		function Suchgebiet_zeichnen() {
-			if (measureTooltipElement) {
-				measureTooltipElement.parentNode.removeChild(measureTooltipElement);
-			}
-			measureTooltipElement = document.createElement('div');
-			measureTooltipElement.className = 'tooltip tooltip-measure';
-			measureTooltip = new Overlay({
-				element: measureTooltipElement,
-				offset: [0, -100],
-				positioning: 'top-center',
-				className: 'drawInfo'
-			});
-			etraxmap.addOverlay(measureTooltip);
-		}
 		
 		jQuery('#suchgebiete').on('change','#searchtype', function(){
 			jQuery('.start-measure').show();
@@ -2055,31 +2044,36 @@ function showmap(){
 			
 		jQuery('#suchgebiete').on('click','.start-measure',function(e) {
 			e.preventDefault();
+			etraxmap.removeInteraction(draw);
+			etraxmap.removeInteraction(snap);
+			etraxmap.removeInteraction(modify);
 			if(jQuery("#searchtype").val() != ""){
-				jQuery(".stop-measure").show();
-				jQuery("#suchgebiete .save-area").show();
-				jQuery(".modal.searchAreas").modal("hide");
-				jQuery(".start-measure").hide();
+				addInteraction_draw();
+				jQuery("#suchgebiete").modal("hide");
+				jQuery("#savegebiete #searchAreas .typ").html(jQuery("#searchtype option:selected").text());
+				jQuery("#savegebiete").modal("show");
+				jQuery("#savegebiete .save-area").attr("data-type",jQuery("#searchtype").val());
 				jQuery(".tooltip.tooltip-measure").show();
 				jQuery("body").addClass("drawArea");
-				addInteraction();
 			}else{
 				jQuery("#searchtype").popover('show');
 				jQuery(".tooltip.tooltip-measure").hide();
 				jQuery(".stop-measure").hide();
 			}
 		});
-		jQuery("body").on("click","#suchgebiete .stop-measure", function(){
-			jQuery(".save-area,.stop-measure,#area").hide();
+		jQuery("body").on("click","#savegebiete .stop-measure", function(){
+			jQuery("#savegebiete,#area").hide();
 			jQuery(".start-measure").show();
 			areaCoords = [];
 			jQuery("#area").html("");
 			jQuery(".tooltip").hide();
 			jQuery("#searchtype").selectedIndex = 0;
 			etraxmap.removeInteraction(draw);
+			etraxmap.removeInteraction(snap);
+			etraxmap.removeInteraction(modify);
 			sketch = null;
 			measureTooltipElement = null;
-			Suchgebiet_zeichnen();
+			//Suchgebiet_zeichnen();
 			unByKey(listener);
 		});	
 		
@@ -2107,7 +2101,7 @@ function showmap(){
 
 
 	// Suchgebiete
-	jQuery(".nav-link.suchgebiete").click(function(){
+	jQuery('.navbar').on('click','.nav-link.suchgebiete',function(){
 		Suchgebiete_Modal_anzeigen();
 		jQuery('.modal.searchAreas').modal('show');
 		jQuery('.start-measure').hide();
@@ -2150,7 +2144,7 @@ function showmap(){
 					//gruppe = (gruppe == "e_group0") ? "Keine Zuweisung" : val.properties.gruppe;
 
 				if(Orgfunction.einsatzleitung){// lead
-					deleteButton = '<a href="#" title="Suchgebiet löschen" data-db="suchgebiet" data-field="and_id" data-value="'+id+'" class="deletearea showtooltip" data-original-title="Suchgebiet löschen"><i class="material-icons">delete</i></a>';
+					deleteButton = '<a href="#" title="Suchgebiet löschen" data-db="suchgebiete" data-field="and_id" data-value="'+id+'" class="deletearea showtooltip" data-original-title="Suchgebiet löschen"><i class="material-icons">delete</i></a>';
 					chooseGruoup = '<select class="groupselected custom-select showtooltip" style="border:1px solid ' + color + '" data-id="'+i+'" data-status="'+status+'" data-gruppenID="'+gruppe+'" data-typ="'+areaType+'" data-size="'+masse+'" data-original-title="Gruppenzuweisung ändern"></select>';
 				}else if(Orgfunction.zuweisen){
 					chooseGruoup = '<select class="groupselected custom-select showtooltip" style="border:1px solid ' + color + '" data-id="'+i+'" data-status="'+status+'" data-gruppenID="'+gruppe+'" data-typ="'+areaType+'" data-size="'+masse+'" data-original-title="Gruppenzuweisung ändern"></select>';
@@ -2330,7 +2324,7 @@ function showmap(){
 	jQuery("body").on("click","#showAreas .deletearea,.popover .deletetype",function(e){
 		e.preventDefault();
 		jQuery('.popover.show').popover('dispose');
-		if(jQuery(this).attr('data-db') == 'suchgebiet'){
+		if(jQuery(this).attr('data-db') == 'suchgebiete'){
 			if(window.confirm("Suchgebiet löschen?")){
 				Suchgebiet_loeschen(jQuery(this));
 			}
@@ -3254,6 +3248,29 @@ function showmap(){
 			view.fit(polygon, {padding: [170, 50, 30, 150]});
 	}
 
+
+	
+
+	//Alle Tracks einer Gruppe ausblenden
+	jQuery('.usertracks #tracklist').on('click','.hiding_all', function(evt){
+		evt.preventDefault();
+		let e = jQuery(this),
+			collapse = e.attr('data-collapsid');
+		console.log($(this));
+		if(e.hasClass('show')){
+			$(collapse + ' .hiding.show').each(function(){
+				$(this).removeClass('show').attr('data-original-title','Track einblenden').find('i').html('check_box_outline_blank');
+			});
+			e.removeClass('show').attr('data-original-title','Track einblenden').find('i').html('check_box_outline_blank');
+		}else{
+			$(collapse + ' .hiding').each(function(){
+				$(this).addClass('show').attr('data-original-title','Track ausblenden').find('i').html('check_box');
+			});
+			e.addClass('show').attr('data-original-title','Track ausblenden').find('i').html('check_box');
+		}
+		e.tooltip('hide');
+	});
+
 	//Tracks ausblenden
 	jQuery('.usertracks #tracklist').on('click','.hiding', function(){
 		let e = jQuery(this);
@@ -3266,13 +3283,19 @@ function showmap(){
 	});
 
 
+
 	let toggleTrack = function(){
-		let gid,uid,tid,divider,hiddentracks = [];
+		let atid,alltrackshidden = [],gid,uid,tid,hiddentracks = [];
+		jQuery('.usertracks #tracklist .hiding_all').each(function(i){
+			atid = jQuery(this).attr('id');
+			if(!jQuery(this).hasClass('show')){
+				let aht = alltrackshidden.push(atid);
+			}
+		});
 		jQuery('.usertracks #tracklist .hiding').each(function(i){
 			gid = jQuery(this).attr('data-gid');
 			uid = jQuery(this).attr('data-uid');
 			tid = jQuery(this).attr('data-id');
-			divider = (i > 0) ? ', ' : '';
 			if(!jQuery(this).hasClass('show')){
 				let ht = hiddentracks.push(tid);
 			}
@@ -3286,6 +3309,7 @@ function showmap(){
 			}
 		}).done(function(e) {
 			sessionStorage.setItem("hiddentracks", hiddentracks);
+			sessionStorage.setItem("alltrackshidden", alltrackshidden);
 			Tracks_einlesen();
 			location.reload();
 		});

@@ -44,7 +44,7 @@ jQuery(function() {
 	let Mitglied_in_Einsatz_nehmen = function(item){
 		item.removeClass("nochimeinsatz")
 			.fadeOut()
-			.prependTo($("#imEinsatz .members"))
+			.prependTo($("#imEinsatz .members #collapseimEinsatz_"+item.attr("data-oid")))
 			.removeClass("btn-outline-secondary text-left")
 			.addClass("success list-group-item mt-2 w-100 d-flex")
 			.fadeIn()
@@ -55,7 +55,9 @@ jQuery(function() {
 		if(hasmoveleft == 0){
 			item.prepend('<i class="moveleft material-icons">arrow_back</i>');
 		}
-		
+		let $counter = $("#imEinsatz .members [aria-controls='collapse"+item.attr("data-oid")+"'] .iE-count");
+		let num = parseInt($counter.text());
+		$counter.text(num + 1);
 		//var eid = <?php echo $EID;?>;
 		let oldeid = item.attr("data-oldeid");
 		let uid = item.attr("data-uid");
@@ -119,6 +121,9 @@ jQuery(function() {
 		let uid = item.attr("data-uid");
 		let oid = item.attr("data-oid");
 		let editicon = (oid != 'Material') ? '<i title="Mitglied editieren" class="edituser material-icons">mode_edit</i>' : '';
+		let $counter = $("#imEinsatz .members [aria-controls='collapse"+item.attr("data-oid")+"'] .iE-count");
+		let num = parseInt($counter.text());
+		$counter.text(num - 1);
 		if(target == "#members"){
 			item.attr("data-oldeid","");
 			item.removeClass("btn-outline-success")
@@ -331,9 +336,10 @@ jQuery(function() {
 	let ImEinsatzcount = function(){
 		let all_personal = $('#imEinsatz .members li').length;
 		let HFcount = $('#imEinsatz .members li[data-typ="HF"]').length;
+		let Hcount = $('#imEinsatz .members li[data-typ="H"]').length;
 		$('#imEinsatz h4 .HFcount').html(HFcount);
-		$('#imEinsatz h4 .Hcount').html(all_personal - HFcount);
+		$('#imEinsatz h4 .Hcount').html(Hcount);
 	}
-
+	ImEinsatzcount();
 	let countMembers = setInterval(ImEinsatzcount,60000);
 });

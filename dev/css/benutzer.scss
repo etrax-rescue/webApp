@@ -60,6 +60,10 @@
 		float: none;
 		text-align: left;
 		color:$gray;
+		ul{
+			padding-left:0;
+			list-style-type:none;
+		}
 	}
 	li.sender{
 		span {

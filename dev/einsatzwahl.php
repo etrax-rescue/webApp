@@ -221,6 +221,38 @@ require("include/header.html");
 								}?>
 							</select>
 							</div>
+							<div class="form-group" id="beteiligteORG">
+								<?php
+									$loop_i = 0;
+									foreach($org_arr_check as $org => $val){
+										$jtemp2 = json_decode($org_arr_check[$val["OID"]]["orgfreigabe"],true); //JSON mit den von temporärer Organisation freigegebenen Organisationen
+										if(isset($jtemp[$val["OID"]])){
+											if(isset($jtemp2[$_SESSION["etrax"]["OID"]]) && $_SESSION["etrax"]["OID"] != $org_arr_check[$val["OID"]]["OID"]){
+												if($loop_i == 0){
+													?>
+										<div class="text-uppercase">Beteiligte Organisationen:</div>
+										<table class="table table-bordered table-striped">
+											<tr>
+												<td>Alle Rechte</td>
+												<td>anmelden</td>
+												<td> </td>
+											</tr>
+													<?php
+												}
+											?>
+											<tr class="align-middle">
+												<td class="text-center"><input class="admin" type="checkbox" value="<?php echo $org_arr_check[$val["OID"]]["OID"]; ?>" id="<?php echo $org_arr_check[$val["OID"]]["OID"]; ?>"></td>
+												<td class="text-center"><input class="user" type="checkbox" value="<?php echo $org_arr_check[$val["OID"]]["OID"]; ?>" id="<?php echo $org_arr_check[$val["OID"]]["OID"]; ?>"></td>
+												<td><?php echo $org_arr_check[$val["OID"]]["kurzname"]; ?></td>
+											</tr>
+											<?php
+											$loop_i += 1;
+											}
+										}
+									}
+								?>
+								</table>
+							</div>
 							<div class="form-group e_typ">
 								<input type="radio" name="typ" id="e" value="einsatz" checked> <label for="e">Einsatz</label><br>
 								<input type="radio" name="typ" id="ue" value="uebung"> <label for="ue">Übung</label>
